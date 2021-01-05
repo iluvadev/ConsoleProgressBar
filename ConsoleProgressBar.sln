@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleProgressBar", "ConsoleProgressBar\ConsoleProgressBar.csproj", "{415D677E-01C5-46D0-B91A-4F78D06B47FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleProgressBarDemo", "ConsoleProgressBarDemo\ConsoleProgressBarDemo.csproj", "{C0CA7D84-1CDF-48B0-813B-48983ABACE7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{415D677E-01C5-46D0-B91A-4F78D06B47FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{415D677E-01C5-46D0-B91A-4F78D06B47FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415D677E-01C5-46D0-B91A-4F78D06B47FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{415D677E-01C5-46D0-B91A-4F78D06B47FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0CA7D84-1CDF-48B0-813B-48983ABACE7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0CA7D84-1CDF-48B0-813B-48983ABACE7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0CA7D84-1CDF-48B0-813B-48983ABACE7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0CA7D84-1CDF-48B0-813B-48983ABACE7B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BFD762A6-09CC-411D-B56E-B49F4A1A6F98}
+	EndGlobalSection
+EndGlobal

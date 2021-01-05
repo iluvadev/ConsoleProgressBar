@@ -1,0 +1,16 @@
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBarDemo.exe
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBarDemo.deps.json
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBarDemo.runtimeconfig.json
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBarDemo.runtimeconfig.dev.json
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBarDemo.dll
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBarDemo.pdb
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBar.dll
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\bin\Debug\netcoreapp3.1\ConsoleProgressBar.pdb
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.csprojAssemblyReference.cache
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.AssemblyInfoInputs.cache
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.AssemblyInfo.cs
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.csproj.CoreCompileInputs.cache
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.csproj.CopyComplete
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.dll
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.pdb
+C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBarDemo\obj\Debug\netcoreapp3.1\ConsoleProgressBarDemo.genruntimeconfig.cache
