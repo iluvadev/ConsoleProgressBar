@@ -1,9 +1,0 @@
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\bin\Debug\netcoreapp3.1\ConsoleProgressBar.deps.json
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\bin\Debug\netcoreapp3.1\ConsoleProgressBar.dll
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\bin\Debug\netcoreapp3.1\ConsoleProgressBar.pdb
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\obj\Debug\netcoreapp3.1\ConsoleProgressBar.csprojAssemblyReference.cache
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\obj\Debug\netcoreapp3.1\ConsoleProgressBar.AssemblyInfoInputs.cache
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\obj\Debug\netcoreapp3.1\ConsoleProgressBar.AssemblyInfo.cs
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\obj\Debug\netcoreapp3.1\ConsoleProgressBar.csproj.CoreCompileInputs.cache
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\obj\Debug\netcoreapp3.1\ConsoleProgressBar.dll
-C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\obj\Debug\netcoreapp3.1\ConsoleProgressBar.pdb

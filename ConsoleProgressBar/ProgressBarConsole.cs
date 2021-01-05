@@ -9,7 +9,8 @@ namespace ConsoleProgressBar
     public class ProgressBarConsole : IDisposable
     {
         //Opcions
-        public int InnerLength { get; set; } = 50;
+        public int InnerLength { get; set; } = 28;
+        public int TotalLengt => InnerLength + 2;
 
         public ProgressBarLayout Layout { get; private set; }
 
@@ -31,7 +32,7 @@ namespace ConsoleProgressBar
         private int MarqueePosition { get; set; } = -1;
         private int MarqueeIncrement { get; set; } = 1;
         public int Percentage => Maximum != 0 ? ((Value * 100) / Maximum) : 100;
-        private string LastProgressPrinted { get; set; }
+        private string LastProgressRemoval { get; set; }
 
         private Stopwatch ProgressStopwatch { get; set; }
         public TimeSpan CurrentTime => ProgressStopwatch.Elapsed;
@@ -125,20 +126,28 @@ namespace ConsoleProgressBar
             Value += Step;
         }
 
+        private void RemoveLastProgressBar()
+        {
+            if (!string.IsNullOrEmpty(LastProgressRemoval))
+                Console.Write(LastProgressRemoval);
+        }
+
         private void PrintProgressBar()
         {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < (LastProgressPrinted ?? "").Length; i++)
-                sb.Append("\b \b");
+            RemoveLastProgressBar();
 
             string progress = GetProgressBar();
             string text = Text ?? ProgressTextFunc?.Invoke(this);
             if (!string.IsNullOrEmpty(text))
                 progress += " " + text;
 
-            sb.Append(progress);
-            Console.Write(sb.ToString());
-            LastProgressPrinted = progress;
+            Console.Write(progress);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < progress.Length; i++)
+                sb.Append("\b \b");
+
+            LastProgressRemoval = sb.ToString();
         }
 
 
@@ -218,7 +227,5 @@ namespace ConsoleProgressBar
 
             Console.WriteLine(string.Empty);
         }
-
-        //TODO: Nova Funció: Reset
     }
 }
