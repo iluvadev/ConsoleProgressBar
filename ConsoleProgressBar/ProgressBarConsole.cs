@@ -27,40 +27,48 @@ namespace ConsoleProgressBar
         public int MarqueeDelay { get; set; } = 75;
         public bool ShowProgress { get; set; } = true;
 
-        public string Text { get; set; }
+        public string CurrentElementName { get; set; }
 
         private int MarqueePosition { get; set; } = -1;
         private int MarqueeIncrement { get; set; } = 1;
         public int Percentage => Maximum != 0 ? ((Value * 100) / Maximum) : 100;
-        //private string LastProgressRemoval { get; set; }
 
         private Stopwatch ProgressStopwatch { get; set; }
         public TimeSpan ProcessingTime => ProgressStopwatch.Elapsed;
-        public TimeSpan RemainingTime { get; private set; }
+        private TimeSpan TimePerElement => new TimeSpan(TicksPerElement);
+        private long TicksPerElement
+             => Value > 0 ? (long)Math.Round((decimal)ProgressStopwatch.ElapsedTicks / Value) : ProgressStopwatch.ElapsedTicks;
+        public TimeSpan RemainingTime => new TimeSpan(TicksPerElement * (Maximum - Value));
 
-        public bool IsDone => Value == Maximum;
+        public bool IsDone => CancelThread || (ShowProgress && Value == Maximum);
 
-        public Func<ProgressBarConsole, string> ProgressTextFunc { get; set; }
-            = (pb) =>
-            {
-                if (!string.IsNullOrEmpty(pb.Text))
-                    return pb.Text;
-                else if (pb.IsDone)
-                    return $"Done! {pb.Maximum} in {pb.ProcessingTime.TotalHours:F0}{pb.ProcessingTime:\\:mm\\:ss\\.fff}";
-                else if (pb.ShowProgress)
-                    return $"{pb.Value} of {pb.Maximum} in {pb.ProcessingTime.TotalHours:F0}{pb.ProcessingTime:\\:mm\\:ss\\.fff}, remaining {pb.RemainingTime.TotalHours:F0}{pb.RemainingTime:\\:mm\\:ss}";
-                return null;
-            };
+        private int _ConsoleRow = -1;
+
+        public Func<ProgressBarConsole, string> UndefinedProgressTextGetter { get; set; }
+            = (pb) => $"Processing... ({pb.Value} in {pb.ProcessingTime.ToStringWithAllHours(true)})";
+
+        public Func<ProgressBarConsole, string> ProgressTextGetter { get; set; }
+            = (pb) => $"{pb.Value} of {pb.Maximum} in {pb.ProcessingTime.ToStringWithAllHours(true)}, remaining {pb.RemainingTime.ToStringWithAllHours()}";
+
+        public Func<ProgressBarConsole, string[]> MultiLineGetter { get; set; }
+            = (pb) => new string[] { $" > {pb.CurrentElementName}" };
+
+        public Func<ProgressBarConsole, string> DoneTextGetter { get; set; }
+            = (pb) => $"Done!";
+
+        public Func<ProgressBarConsole, string[]> DoneMultiLineGetter { get; set; }
+            = (pb) => new string[] { $" > {pb.Value} in {pb.ProcessingTime.ToStringWithAllHours(true)} ({pb.TimePerElement.ToStringWithAllHours(true)} each one)" };
+
 
         private Thread WorkingThread { get; set; }
         private bool CancelThread { get; set; }
         private bool Started { get; set; }
         private bool Paused { get; set; }
+        private static readonly object ConsoleWriterLock = new object();
 
         public ProgressBarConsole(bool autoStart, ProgressBarLayout layout)
         {
             ProgressStopwatch = new Stopwatch();
-            RemainingTime = new TimeSpan(0);
             Layout = layout;
             if (autoStart)
                 Start();
@@ -120,39 +128,55 @@ namespace ConsoleProgressBar
             if (value > Maximum)
                 Maximum = value;
             _Value = value;
-
-            if (value != 0)
-                UpdateReminingTime();
         }
-        public void PerformStep(string text = null)
+        public void PerformStep(string newElementName = null)
         {
-            Text = text;
+            CurrentElementName = newElementName;
             Value += Step;
         }
 
-        //private void RemoveLastProgressBar()
-        //{
-        //    if (!string.IsNullOrEmpty(LastProgressRemoval))
-        //        Console.Write(LastProgressRemoval);
-        //}
 
         private void PrintProgressBar()
         {
-            //RemoveLastProgressBar();
-
-            string progress = GetProgressBar();
-            string text = ProgressTextFunc?.Invoke(this) ?? Text;
+            string progressBar = GetProgressBar();
+            string text = "";
+            //Text will be printed if there are 10 chars or more
+            if (progressBar.Length <= Console.BufferWidth - 10)
+            {
+                if (IsDone)
+                    text = DoneTextGetter?.Invoke(this);
+                else if (ShowProgress)
+                    text = ProgressTextGetter?.Invoke(this);
+                else
+                    text = UndefinedProgressTextGetter?.Invoke(this);
+            }
+            string progressBarLine = progressBar;
             if (!string.IsNullOrEmpty(text))
-                progress += " " + text;
+                progressBarLine += " " + text;
 
+            lock (ConsoleWriterLock)
+            {
+                if (_ConsoleRow < 0)
+                    _ConsoleRow = Console.CursorTop;
+                int oldCursorLeft = Console.CursorLeft;
+                int oldCursorTop = Console.CursorTop;
 
-            Console.Write("\r" + progress + new string(' ', Console.BufferWidth - progress.Length));
+                Console.SetCursorPosition(0, _ConsoleRow);
+                Console.WriteLine("\r" + progressBarLine.Truncate(Console.BufferWidth).PadRight(Console.BufferWidth));
+                if (IsDone)
+                {
+                    foreach (var line in DoneMultiLineGetter?.Invoke(this) ?? new string[0])
+                        Console.WriteLine(line.Truncate(Console.BufferWidth).PadRight(Console.BufferWidth));
+                }
+                else
+                {
+                    foreach (var line in MultiLineGetter?.Invoke(this) ?? new string[0])
+                        Console.WriteLine(line.Truncate(Console.BufferWidth).PadRight(Console.BufferWidth));
+                }
 
-            //StringBuilder sb = new StringBuilder();
-            //for (int i = 0; i < progress.Length; i++)
-            //    sb.Append("\b \b");
-
-            //LastProgressRemoval = sb.ToString();
+                if (_ConsoleRow != oldCursorTop)
+                    Console.SetCursorPosition(oldCursorLeft, oldCursorTop);
+            }
         }
 
 
@@ -196,26 +220,6 @@ namespace ConsoleProgressBar
             return sb.ToString();
         }
 
-        private void UpdateReminingTime()
-        {
-            long ticksPerItem = (long)Math.Round((decimal)ProgressStopwatch.ElapsedTicks / Value);
-            TimeSpan newRemainingTime = new TimeSpan(ticksPerItem * (Maximum - Value));
-            if (RemainingTime.TotalSeconds == 0)
-                RemainingTime = newRemainingTime;
-            else
-            {
-                var difSeconds = (int)Math.Abs((newRemainingTime - RemainingTime).TotalSeconds);
-                if (difSeconds >= 1)
-                {
-                    if (newRemainingTime > RemainingTime)
-                        RemainingTime = RemainingTime.Add(new TimeSpan(0, 0, difSeconds));
-                    else
-                        RemainingTime = RemainingTime.Add(new TimeSpan(0, 0, (difSeconds / 2) * -1));
-                }
-            }
-        }
-
-
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -229,8 +233,6 @@ namespace ConsoleProgressBar
             if (ProgressStopwatch.IsRunning)
                 ProgressStopwatch.Stop();
             ProgressStopwatch.Reset();
-
-            Console.WriteLine(string.Empty);
         }
     }
 }
