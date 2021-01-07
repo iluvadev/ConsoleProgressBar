@@ -8,11 +8,10 @@ namespace ConsoleProgressBar
 {
     public class ProgressBarConsole : IDisposable
     {
-        //Opcions
+        public ProgressBarLayout Layout { get; set; }
+
         public int InnerLength { get; set; } = 28;
         public int TotalLengt => InnerLength + Layout.Start.Length + Layout.End.Length;
-
-        public ProgressBarLayout Layout { get; private set; }
 
         public int Maximum { get; set; } = 100;
         private int _Value = 0;
@@ -24,31 +23,42 @@ namespace ConsoleProgressBar
         public int Step { get; set; } = 1;
 
         public bool ShowMarquee { get; set; } = true;
-        public int MarqueeDelay { get; set; } = 75;
         public bool ShowProgress { get; set; } = true;
+        public int MarqueeDelay { get; set; } = 75;
 
         public string CurrentElementName { get; set; }
 
-        private int MarqueePosition { get; set; } = -1;
-        private int MarqueeIncrement { get; set; } = 1;
         public int Percentage => Maximum != 0 ? ((Value * 100) / Maximum) : 100;
-
-        private Stopwatch ProgressStopwatch { get; set; }
-        public TimeSpan ProcessingTime => ProgressStopwatch.Elapsed;
-        private TimeSpan TimePerElement => new TimeSpan(TicksPerElement);
-        private long TicksPerElement
-             => Value > 0 ? (long)Math.Round((decimal)ProgressStopwatch.ElapsedTicks / Value) : ProgressStopwatch.ElapsedTicks;
-        public TimeSpan RemainingTime => new TimeSpan(TicksPerElement * (Maximum - Value));
-
         public bool IsDone => CancelThread || (ShowProgress && Value == Maximum);
 
-        private int _ConsoleRow = -1;
+        public TimeSpan ProcessingTime => ProgressStopwatch.Elapsed;
+        public TimeSpan TimePerElement => new TimeSpan(TicksPerElement);
+        public TimeSpan? RemainingTime { get; private set; } = null;
+
+
+        public Func<TimeSpan?, string> RemainingTimeSpanToStringConverter { get; set; }
+            = (ts) =>
+            {
+                int units;
+                if (!ts.HasValue) return "unknown";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalDays))) > 1) return $"{units} days";
+                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalDays))) == 1) return $"{units} day";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalHours))) > 1) return $"{units} hours";
+                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalHours))) == 1) return $"{units} hour";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalMinutes))) > 1) return $"{units} minutes";
+                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalMinutes))) == 1) return $"{units} minute";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalSeconds))) > 1) return $"{units} seconds";
+                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalSeconds))) == 1) return $"{units} second";
+                else return "a moment";
+            };
+        public Func<TimeSpan, string> ProcessTimeSpanToStringConverter { get; set; }
+            = (ts) => $"{ts.TotalHours:F0}{ts:\\:mm\\:ss\\.fff}";
 
         public Func<ProgressBarConsole, string> UndefinedProgressTextGetter { get; set; }
-            = (pb) => $"Processing... ({pb.Value} in {pb.ProcessingTime.ToStringWithAllHours(true)})";
+            = (pb) => $"Processing... ({pb.Value} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)})";
 
         public Func<ProgressBarConsole, string> ProgressTextGetter { get; set; }
-            = (pb) => $"{pb.Value} of {pb.Maximum} in {pb.ProcessingTime.ToStringWithAllHours(true)}, remaining {pb.RemainingTime.ToStringWithAllHours()}";
+            = (pb) => $"{pb.Value} of {pb.Maximum} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)}, remaining: {pb.RemainingTimeSpanToStringConverter?.Invoke(pb.RemainingTime)}";
 
         public Func<ProgressBarConsole, string[]> MultiLineGetter { get; set; }
             = (pb) => new string[] { $" > {pb.CurrentElementName}" };
@@ -57,14 +67,23 @@ namespace ConsoleProgressBar
             = (pb) => $"Done!";
 
         public Func<ProgressBarConsole, string[]> DoneMultiLineGetter { get; set; }
-            = (pb) => new string[] { $" > {pb.Value} in {pb.ProcessingTime.ToStringWithAllHours(true)} ({pb.TimePerElement.ToStringWithAllHours(true)} each one)" };
+            = (pb) => new string[] { $" > {pb.Value} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)} ({pb.ProcessTimeSpanToStringConverter?.Invoke(pb.TimePerElement)} each one)" };
+
+
+        private int MarqueePosition { get; set; } = -1;
+        private int MarqueeIncrement { get; set; } = 1;
 
 
         private Thread WorkingThread { get; set; }
         private bool CancelThread { get; set; }
         private bool Started { get; set; }
         private bool Paused { get; set; }
+
+        private Stopwatch ProgressStopwatch { get; set; }
+        private long TicksPerElement { get; set; }
+
         private static readonly object ConsoleWriterLock = new object();
+        private int _ConsoleRow = -1;
 
         public ProgressBarConsole(bool autoStart, ProgressBarLayout layout)
         {
@@ -128,6 +147,7 @@ namespace ConsoleProgressBar
             if (value > Maximum)
                 Maximum = value;
             _Value = value;
+            UpdateRemainingTime();
         }
         public void PerformStep(string newElementName = null)
         {
@@ -135,6 +155,11 @@ namespace ConsoleProgressBar
             Value += Step;
         }
 
+        private void UpdateRemainingTime()
+        {
+            TicksPerElement = Value > 0 ? (long)Math.Round((decimal)ProgressStopwatch.ElapsedTicks / Value) : ProgressStopwatch.ElapsedTicks;
+            RemainingTime = Value == 0 ? null as TimeSpan? : new TimeSpan(TicksPerElement * (Maximum - Value));
+        }
 
         private void PrintProgressBar()
         {
@@ -228,6 +253,7 @@ namespace ConsoleProgressBar
         {
             CancelThread = true;
             ShowMarquee = false;
+            UpdateRemainingTime();
             PrintProgressBar();
 
             if (ProgressStopwatch.IsRunning)

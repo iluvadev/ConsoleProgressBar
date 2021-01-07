@@ -22,10 +22,12 @@ namespace ConsoleProgressBarDemo
                 {
                     var randomNum = random.Next(200);
                     pg.CurrentElementName = "";
+
                     for (int j = 0; j < randomNum; j++)
                         pg.CurrentElementName += (char)(random.Next(25) + 65);
 
-                    Task.Delay(randomNum).Wait();
+                    //Task.Delay(randomNum).Wait();
+                    Task.Delay(150).Wait();
                     pg.PerformStep();
                     //Console.Write($"Prova {i}...");
                 }
