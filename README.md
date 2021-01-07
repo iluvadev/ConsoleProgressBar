@@ -21,7 +21,7 @@ using (var pg = new ProgressBar() { Maximum = 5 }) //Create the ProgressBar
 }
 ```
  
- ![Screencapture ConsoleProgressBar without Progress (only Marquee)](ProgressBarConsole-DefaultConfig-NoProgress.gif)
+ ![Screencapture ConsoleProgressBar without Progress (only Marquee)](Images/ProgressBarConsole-DefaultConfig-NoProgress.gif)
 Code:
 ```csharp
 using (var pg = new ProgressBar() { ShowProgress = false }) //Create the ProgressBar
