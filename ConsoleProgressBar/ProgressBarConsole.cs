@@ -29,6 +29,8 @@ namespace ConsoleProgressBar
         public string CurrentElementName { get; set; }
 
         public int Percentage => Maximum != 0 ? ((Value * 100) / Maximum) : 100;
+        public bool IsStarted { get; private set; }
+        public bool IsPaused { get; private set; }
         public bool IsDone => CancelThread || (ShowProgress && Value == Maximum);
 
         public TimeSpan ProcessingTime => ProgressStopwatch.Elapsed;
@@ -55,13 +57,15 @@ namespace ConsoleProgressBar
             = (ts) => $"{ts.TotalHours:F0}{ts:\\:mm\\:ss\\.fff}";
 
         public Func<ProgressBarConsole, string> UndefinedProgressTextGetter { get; set; }
-            = (pb) => $"Processing... ({pb.Value} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)})";
+            = (pb) => pb.IsPaused ?
+                        $"Paused... Running time: {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)}" :
+                        $"Processing... ({pb.Value} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)})";
 
         public Func<ProgressBarConsole, string> ProgressTextGetter { get; set; }
-            = (pb) => $"{pb.Value} of {pb.Maximum} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)}, remaining: {pb.RemainingTimeSpanToStringConverter?.Invoke(pb.RemainingTime)}";
+            = (pb) => $"{pb.Value} of {pb.Maximum} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)}{(pb.IsPaused ? " (paused)" : $", remaining: {pb.RemainingTimeSpanToStringConverter?.Invoke(pb.RemainingTime)}")}";
 
         public Func<ProgressBarConsole, string[]> MultiLineGetter { get; set; }
-            = (pb) => new string[] { $" > {pb.CurrentElementName}" };
+            = (pb) => new string[] { pb.IsPaused ? " > Paused <" : $" > {pb.CurrentElementName}" };
 
         public Func<ProgressBarConsole, string> DoneTextGetter { get; set; }
             = (pb) => $"Done!";
@@ -76,8 +80,6 @@ namespace ConsoleProgressBar
 
         private Thread WorkingThread { get; set; }
         private bool CancelThread { get; set; }
-        private bool Started { get; set; }
-        private bool Paused { get; set; }
 
         private Stopwatch ProgressStopwatch { get; set; }
         private long TicksPerElement { get; set; }
@@ -107,7 +109,7 @@ namespace ConsoleProgressBar
 
         public void Start()
         {
-            if (Started)
+            if (IsStarted)
                 Resume();
             else
             {
@@ -117,7 +119,7 @@ namespace ConsoleProgressBar
                       ProgressStopwatch.Start();
                       while (!CancelThread)
                       {
-                          if (!Paused)
+                          if (!IsPaused)
                           {
                               UpdateMarqueePosition();
                               PrintProgressBar();
@@ -133,13 +135,15 @@ namespace ConsoleProgressBar
         }
         public void Pause()
         {
-            Paused = true;
+            IsPaused = true;
             ProgressStopwatch.Stop();
+            PrintProgressBar();
         }
         public void Resume()
         {
             ProgressStopwatch.Start();
-            Paused = false;
+            IsPaused = false;
+            PrintProgressBar();
         }
 
         private void SetValue(int value)
