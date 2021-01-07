@@ -1,4 +1,6 @@
-﻿using ConsoleProgressBar;
+﻿// Copyright (c) 2020, iluvadev, and released under MIT License.  This can be found in the root of this distribution. 
+
+using ConsoleProgressBar;
 using System;
 using System.Threading.Tasks;
 
@@ -8,36 +10,56 @@ namespace ConsoleProgressBarDemo
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Demo for ProgressBarConsole");
-            Console.WriteLine("---------------------------");
-
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(" ProgressBarConsole with default configuration: ");
-            //Console.ReadKey();
+            Console.CursorVisible = false;
             Random random = new Random(Guid.NewGuid().GetHashCode());
-            using (var pg = new ProgressBarConsole())
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    var randomNum = random.Next(200);
-                    pg.CurrentElementName = "";
-                    if(i%10==0)
-                    {
-                        pg.Pause();
-                        Task.Delay(1000).Wait();
-                        pg.Resume();
-                    }
-                    for (int j = 0; j < randomNum; j++)
-                        pg.CurrentElementName += (char)(random.Next(25) + 65);
 
-                    //Task.Delay(randomNum).Wait();
-                    Task.Delay(150).Wait();
+            //Console.WriteLine("Demo for ProgressBar");
+            //Console.WriteLine("---------------------------");
+
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine(" ProgressBar with long running tasks:");
+            //Console.WriteLine();
+            //Console.ReadKey();
+            using (var pg = new ProgressBar() { Maximum = 5 })
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    var randomNum = random.Next(250);
+                    string elementName = "";
+                    for (int j = 0; j < randomNum; j++)
+                        elementName += (char)(random.Next(25) + 65);
+
+                    pg.CurrentElementName = elementName;
+                    Task.Delay(2000).Wait();
                     pg.PerformStep();
-                    //Console.Write($"Prova {i}...");
+
                 }
             }
-            ////Console.ReadKey();
+            //Console.ReadKey();
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(" ProgressBar without progress:");
+            Console.WriteLine();
+            Console.ReadKey();
+            using (var pg = new ProgressBar() { ShowProgress = false })
+            {
+                for (int i = 0; i < 500; i++)
+                {
+                    var randomNum = random.Next(100);
+                    string elementName = "";
+                    for (int j = 0; j < randomNum; j++)
+                        elementName += (char)(random.Next(25) + 97);
+
+                    pg.CurrentElementName = elementName;
+                    Task.Delay(10).Wait();
+                    pg.PerformStep();
+                }
+            }
+            Console.ReadKey();
+
+
 
             //Console.WriteLine();
             //Console.WriteLine();
