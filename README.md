@@ -3,17 +3,17 @@ A ProgressBar for Console, in C#
 It needs only a file: ConsoleProgressBar.cs
 (Readme under construction)
 
-![Screencapture ConsoleProgressBar with DefaultConfig: LongRunning](Images/ProgressBarConsole-DefaultConfig-LongRunning.gif)
+![Screencapture ConsoleProgressBar with Default Config](Images/ProgressBarConsole-Default.gif)
 Code:
 ```csharp
-using (var pg = new ProgressBar() { Maximum = 5 }) //Create the ProgressBar
+using (var pg = new ProgressBar() { Maximum = 1000 }) //Create the ProgressBar
 {
-  for (int i = 0; i < 5; i++)  //Iterate over elements
+  for (int i = 0; i < 1000; i++)  //Iterate over elements
   {
     //Assign Current element Name
     pg.CurrentElementName = elementName[i];
 		
-    Task.Delay(2000).Wait();  //Do long running task
+    Task.Delay(20).Wait();  //Do something
 		
     //PerformStep in ProgressBar
     pg.PerformStep();
@@ -21,20 +21,26 @@ using (var pg = new ProgressBar() { Maximum = 5 }) //Create the ProgressBar
 }
 ```
  
- ![Screencapture ConsoleProgressBar without Progress (only Marquee)](Images/ProgressBarConsole-DefaultConfig-NoProgress.gif)
+ ![Screencapture ConsoleProgressBar with Default Config: writing](Images/ProgressBarConsole-Default-Writing.gif)
 Code:
 ```csharp
-using (var pg = new ProgressBar() { ShowProgress = false }) //Create the ProgressBar
+using (var pg = new ProgressBar() { Maximum = 50 }) //Create the ProgressBar
 {
-  while(!exit)
+  for (int i = 0; i < 50; i++)  //Iterate over elements
   {
     //Assign Current element Name
-    pg.CurrentElementName = GetElementName();
-		
-    Task.Delay(10).Wait();  //Do something
+    pg.CurrentElementName = elementName[i];
+
+	//Lock Console for Writing
+    lock (ProgressBar.ConsoleWriterLock)
+	{
+	  //Write over the ProgressBar
+	  //Adapt Text to Console width with 'ProgressBar.AdaptTextToMaxWidth'
+      Console.WriteLine(ProgressBar.AdaptTextToMaxWidth($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", Console.BufferWidth));
+	}	
+    Task.Delay(250).Wait();  //Do something
 		
     //PerformStep in ProgressBar
-    //ProgressBar does not have Maximum
     pg.PerformStep();
   }
 }
