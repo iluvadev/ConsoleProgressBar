@@ -30,14 +30,14 @@ using (var pg = new ProgressBar() { Maximum = 50 }) //Create the ProgressBar
   {
     //Assign Current element Name
     pg.CurrentElementName = elementName[i];
-
-	//Lock Console for Writing
+    
+    //Lock Console for Writing
     lock (ProgressBar.ConsoleWriterLock)
-	{
-	  //Write over the ProgressBar
-	  //Adapt Text to Console width with 'ProgressBar.AdaptTextToMaxWidth'
+    {
+      //Write over the ProgressBar
+      //Adapt Text to Console width with 'ProgressBar.AdaptTextToMaxWidth'
       Console.WriteLine(ProgressBar.AdaptTextToMaxWidth($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", Console.BufferWidth));
-	}	
+    }	
     Task.Delay(250).Wait();  //Do something
 		
     //PerformStep in ProgressBar
