@@ -21,43 +21,62 @@ namespace ConsoleProgressBarDemo
             //Console.WriteLine(" ProgressBar with long running tasks:");
             //Console.WriteLine();
             //Console.ReadKey();
-            using (var pg = new ProgressBar() { Maximum = 5 })
+            //using (var pg = new ProgressBar() { Maximum = 5 })
+            //{
+            //    for (int i = 0; i < 5; i++)
+            //    {
+            //        var randomNum = random.Next(250);
+            //        string elementName = "";
+            //        for (int j = 0; j < randomNum; j++)
+            //            elementName += (char)(random.Next(25) + 65);
+
+            //        pg.CurrentElementName = elementName;
+            //        Task.Delay(2000).Wait();
+            //        pg.PerformStep();
+
+            //    }
+            //}
+            //Console.ReadKey();
+
+            //Console.ReadKey();
+            using (var pg = new ProgressBar() { Maximum = 500,})
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 500; i++)
                 {
-                    var randomNum = random.Next(250);
+                    var randomNum = random.Next(150) + 1;
                     string elementName = "";
                     for (int j = 0; j < randomNum; j++)
                         elementName += (char)(random.Next(25) + 65);
-
+                    if (i % 10 == 0)
+                        Console.WriteLine(ProgressBar.AdaptTextToConsoleWidth($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}"));
                     pg.CurrentElementName = elementName;
-                    Task.Delay(2000).Wait();
+                    Task.Delay(200).Wait();
                     pg.PerformStep();
 
                 }
             }
             //Console.ReadKey();
 
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(" ProgressBar without progress:");
-            Console.WriteLine();
-            Console.ReadKey();
-            using (var pg = new ProgressBar() { ShowProgress = false })
-            {
-                for (int i = 0; i < 500; i++)
-                {
-                    var randomNum = random.Next(100);
-                    string elementName = "";
-                    for (int j = 0; j < randomNum; j++)
-                        elementName += (char)(random.Next(25) + 97);
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine(" ProgressBar without progress:");
+            //Console.WriteLine();
+            //Console.ReadKey();
+            //using (var pg = new ProgressBar() { ShowProgress = false })
+            //{
+            //    for (int i = 0; i < 500; i++)
+            //    {
+            //        var randomNum = random.Next(100);
+            //        string elementName = "";
+            //        for (int j = 0; j < randomNum; j++)
+            //            elementName += (char)(random.Next(25) + 97);
 
-                    pg.CurrentElementName = elementName;
-                    Task.Delay(10).Wait();
-                    pg.PerformStep();
-                }
-            }
-            Console.ReadKey();
+            //        pg.CurrentElementName = elementName;
+            //        Task.Delay(10).Wait();
+            //        pg.PerformStep();
+            //    }
+            //}
+            //Console.ReadKey();
 
 
 

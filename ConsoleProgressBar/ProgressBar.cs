@@ -16,7 +16,7 @@ namespace ConsoleProgressBar
         /// <summary>
         /// Definition of a Layout for a ProgressBar representation
         /// </summary>
-        public class ProgressBarLayout
+        public class Layout
         {
             //[■■■■■···············] -> ShowProgress
             //[·······■············] -> ShowMarquee
@@ -83,7 +83,7 @@ namespace ConsoleProgressBar
         /// <summary>
         /// Layout of the ProgressBar
         /// </summary>
-        public ProgressBarLayout Layout { get; set; }
+        public Layout CurrentLayout { get; set; }
 
         /// <summary>
         /// The Maximum value
@@ -122,10 +122,18 @@ namespace ConsoleProgressBar
         public bool ShowProgress { get; set; } = true;
 
         /// <summary>
-        /// Delay for repaint all ProgressBar
-        /// Default = 100
+        /// True to Print the ProgressBar always in last Console Line
+        /// False to Print the ProgressBar fixed in Console (Current position at Starting)
+        /// You can Write at Console and ProgressBar will always be below your lines
+        /// Default = true
         /// </summary>
-        public int RepaintDelay { get; set; } = 100;
+        public bool KeepInLastLine { get; set; } = true;
+
+        /// <summary>
+        /// Delay for repaint all ProgressBar
+        /// Default = 75
+        /// </summary>
+        public int RepaintDelay { get; set; } = 75;
 
         /// <summary>
         /// The Name of the Curent Element
@@ -237,16 +245,17 @@ namespace ConsoleProgressBar
 
         private static readonly object ConsoleWriterLock = new object();
         private int _ConsoleRow = -1;
+        private int _LastLinesWrited = -1;
 
         /// <summary>
         /// Creates an instance of ConsoleProgressBar
         /// </summary>
         /// <param name="autoStart">True if ProgressBar starts automatically</param>
         /// <param name="layout">The layout to use in the ProgressBar</param>
-        public ProgressBar(bool autoStart, ProgressBarLayout layout)
+        public ProgressBar(bool autoStart, Layout layout)
         {
             ProgressStopwatch = new Stopwatch();
-            Layout = layout;
+            CurrentLayout = layout;
             if (autoStart)
                 Start();
         }
@@ -254,7 +263,7 @@ namespace ConsoleProgressBar
         /// Creates an instance of ConsoleProgressBar
         /// </summary>
         /// <param name="layout">The layout to use in the ProgressBar</param>
-        public ProgressBar(ProgressBarLayout layout)
+        public ProgressBar(Layout layout)
             : this(true, layout)
         {
         }
@@ -263,14 +272,14 @@ namespace ConsoleProgressBar
         /// </summary>
         /// <param name="autoStart">True if ProgressBar starts automatically</param>
         public ProgressBar(bool autoStart)
-            : this(autoStart, new ProgressBarLayout())
+            : this(autoStart, new Layout())
         {
         }
         /// <summary>
         /// Creates an instance of ConsoleProgressBar
         /// </summary>
         public ProgressBar()
-            : this(true, new ProgressBarLayout())
+            : this(true, new Layout())
         {
         }
 
@@ -279,6 +288,7 @@ namespace ConsoleProgressBar
         /// </summary>
         public void Start()
         {
+            PrintProgressBar();
             if (IsStarted)
                 Resume();
             else
@@ -291,9 +301,13 @@ namespace ConsoleProgressBar
                       {
                           if (!IsPaused)
                           {
-                              UpdateMarqueePosition();
-                              PrintProgressBar();
-                              Task.Delay(RepaintDelay).Wait();
+                              try
+                              {
+                                  UpdateMarqueePosition();
+                                  PrintProgressBar();
+                                  Task.Delay(RepaintDelay).Wait();
+                              }
+                              catch { }
                           }
                       }
                   })
@@ -348,7 +362,7 @@ namespace ConsoleProgressBar
             RemainingTime = Value == 0 ? null as TimeSpan? : new TimeSpan(TicksPerElement * (Maximum - Value));
         }
 
-        private void PrintProgressBar()
+        public void PrintProgressBar()
         {
             string progressBar = GetProgressBar();
             string text = "";
@@ -368,35 +382,55 @@ namespace ConsoleProgressBar
 
             lock (ConsoleWriterLock)
             {
-                if (_ConsoleRow < 0)
-                    _ConsoleRow = Console.CursorTop;
                 int oldCursorLeft = Console.CursorLeft;
                 int oldCursorTop = Console.CursorTop;
                 bool oldCursorVisible = Console.CursorVisible;
-
+                int oldLinesWrited = _LastLinesWrited;
+               
+                if (_ConsoleRow < 0)
+                    _ConsoleRow = oldCursorTop;
+                if (KeepInLastLine)
+                {
+                    Console.WriteLine(AdaptTextToConsoleWidth(""));
+                    _ConsoleRow = oldCursorTop + 1;
+                }
                 Console.CursorVisible = false;
                 Console.SetCursorPosition(0, _ConsoleRow);
+
                 Console.WriteLine("\r" + AdaptTextToConsoleWidth(progressBarLine));
+                _LastLinesWrited = 1;
                 if (IsDone)
                 {
                     foreach (var line in DoneDescriptionLinesGetter?.Invoke(this) ?? new string[0])
+                    {
                         Console.WriteLine(AdaptTextToConsoleWidth(line));
+                        _LastLinesWrited++;
+                    }
                 }
                 else
                 {
                     foreach (var line in DescriptionLinesGetter?.Invoke(this) ?? new string[0])
+                    {
                         Console.WriteLine(AdaptTextToConsoleWidth(line));
+                        _LastLinesWrited++;
+                    }
+                }
+                if (oldLinesWrited > _LastLinesWrited)
+                {
+                    //Clear old lines
+                    for (int i = 0; i < _LastLinesWrited - oldLinesWrited; i++)
+                        Console.WriteLine(AdaptTextToConsoleWidth(""));
                 }
 
                 if (_ConsoleRow != oldCursorTop)
                     Console.SetCursorPosition(oldCursorLeft, oldCursorTop);
-                
+
                 if (oldCursorVisible)
                     Console.CursorVisible = oldCursorVisible;
             }
         }
 
-        private string AdaptTextToConsoleWidth(string value)
+        public static string AdaptTextToConsoleWidth(string value)
         {
             const string append = "...";
             int maxChars = Console.BufferWidth;
@@ -410,7 +444,7 @@ namespace ConsoleProgressBar
         private void UpdateMarqueePosition()
         {
             int newProgressPosition = MarqueePosition + MarqueeIncrement;
-            if (newProgressPosition < 0 || newProgressPosition >= Layout.InnerLength)
+            if (newProgressPosition < 0 || newProgressPosition >= CurrentLayout.InnerLength)
                 MarqueeIncrement *= -1;
 
             MarqueePosition += MarqueeIncrement;
@@ -423,27 +457,27 @@ namespace ConsoleProgressBar
             //[■■■■■··+············] -> ShowProgress + ShowMarquee
             //[■■■■■■■■#■■■········] -> ShowProgress + ShowMarquee (overlapped)
 
-            int percentageLenght = ShowProgress ? Convert.ToInt32(Percentage / (100f / Layout.InnerLength)) : 0;
+            int percentageLenght = ShowProgress ? Convert.ToInt32(Percentage / (100f / CurrentLayout.InnerLength)) : 0;
 
             StringBuilder sb = new StringBuilder();
-            sb.Append(Layout.Start);
-            for (int i = 0; i < Layout.InnerLength; i++)
+            sb.Append(CurrentLayout.Start);
+            for (int i = 0; i < CurrentLayout.InnerLength; i++)
             {
                 char c;
                 if (i == MarqueePosition && ShowMarquee)
                 {
                     if (ShowProgress)
-                        c = (i < percentageLenght) ? Layout.MarqueeInProgress : Layout.MarqueeInProgressPending;
+                        c = (i < percentageLenght) ? CurrentLayout.MarqueeInProgress : CurrentLayout.MarqueeInProgressPending;
                     else
-                        c = Layout.MarqueeAlone;
+                        c = CurrentLayout.MarqueeAlone;
                 }
                 else
                 {
-                    c = (i < percentageLenght) ? Layout.Progress : Layout.Pending;
+                    c = (i < percentageLenght) ? CurrentLayout.Progress : CurrentLayout.Pending;
                 }
                 sb.Append(c);
             }
-            sb.Append(Layout.End);
+            sb.Append(CurrentLayout.End);
             return sb.ToString();
         }
 

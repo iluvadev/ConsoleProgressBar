@@ -34,7 +34,7 @@ using (var pg = new ProgressBar() { ShowProgress = false }) //Create the Progres
     Task.Delay(10).Wait();  //Do something
 		
     //PerformStep in ProgressBar
-    //ProgressBar does no have Maximum
+    //ProgressBar does not have Maximum
     pg.PerformStep();
   }
 }
