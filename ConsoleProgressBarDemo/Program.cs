@@ -17,7 +17,7 @@ namespace ConsoleProgressBarDemo
             var elementNames = new List<string>();
             for (int i = 0; i < 1000; i++)
             {
-                var randomNum = random.Next(250);
+                var randomNum = random.Next(200)+20;
                 string elementName = "";
                 for (int j = 0; j < randomNum; j++)
                     elementName += (char)(random.Next(25) + 65);
@@ -35,8 +35,7 @@ namespace ConsoleProgressBarDemo
             //{
             //    for (int i = 0; i < 1000; i++)
             //    {
-
-            //        pg.CurrentElementName = elementNames[i % elementNames.Count];
+            //        pg.ElementName = elementNames[i % elementNames.Count];
             //        Task.Delay(10).Wait();
             //        pg.PerformStep();
 
@@ -48,17 +47,39 @@ namespace ConsoleProgressBarDemo
             Console.WriteLine(" ProgressBar with KeepInLastLine (default) - Writing in Console");
             Console.WriteLine();
             Console.ReadKey();
-            using (var pg = new ProgressBar() { Maximum = 50 })
+            using (var pg = new ProgressBar() { Maximum = 500, FixedInBottom = false })
             {
-                for (int i = 0; i < 50; i++)
+                for (int i = 0; i < 500; i++)
                 {
                     string elementName = elementNames[i % elementNames.Count];
-                    lock (ProgressBar.ConsoleWriterLock)
-                        Console.WriteLine(ProgressBar.AdaptTextToMaxWidth($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", Console.BufferWidth));
+                    //pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", false);
 
-                    pg.CurrentElementName = elementName;
-                    Task.Delay(250).Wait();
+                    pg.Layout.DescriptionLinesGetter = null;
+                    pg.ElementName = elementName;
+                    Task.Delay(10).Wait();
                     pg.PerformStep();
+                    if ((i+1) % 100 == 0)
+                        pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i+1} - in {ProgressBar.Utils.ConvertToStringWithAllHours(pg.TimeProcessing, false)}");
+                }
+            }
+            Console.ReadKey();
+            Console.WriteLine();
+            Console.WriteLine(" ProgressBar with KeepInLastLine (default) - Writing in Console");
+            Console.WriteLine();
+            Console.ReadKey();
+            using (var pg = new ProgressBar() { Maximum = 500, FixedInBottom = true })
+            {
+                for (int i = 0; i < 500; i++)
+                {
+                    string elementName = elementNames[i % elementNames.Count];
+                    pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", false);
+
+                    pg.Layout.DescriptionLinesGetter = null;
+                    pg.ElementName = elementName;
+                    Task.Delay(10).Wait();
+                    pg.PerformStep();
+                    if ((i + 1) % 100 == 0)
+                        pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i + 1} - in {ProgressBar.Utils.ConvertToStringWithAllHours(pg.TimeProcessing, false)}");
                 }
             }
             Console.ReadKey();

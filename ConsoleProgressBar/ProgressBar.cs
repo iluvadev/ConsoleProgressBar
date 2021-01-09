@@ -14,57 +14,150 @@ namespace ConsoleProgressBar
     public class ProgressBar : IDisposable
     {
         /// <summary>
+        /// Helper with Utilities
+        /// </summary>
+        public static class Utils
+        {
+            /// <summary>
+            /// Converts a nullable TimeSpan to textual Sumarized remaining text: X days, or Y hours, or Z minutes, etc.
+            /// </summary>
+            /// <param name="ts"></param>
+            /// <returns></returns>
+            public static string ConvertToStringAsSumarizedRemainingText(TimeSpan? ts)
+            {
+                int units;
+                if (!ts.HasValue) return "unknown";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalDays))) > 1) return $"{units} days";
+                else if ((Convert.ToInt32(Math.Floor(ts.Value.TotalDays))) == 1) return $"a day";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalHours))) > 1) return $"{units} hours";
+                else if ((Convert.ToInt32(Math.Floor(ts.Value.TotalHours))) == 1) return $"an hour";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalMinutes))) > 1) return $"{units} minutes";
+                else if ((Convert.ToInt32(Math.Floor(ts.Value.TotalMinutes))) == 1) return $"a minute";
+                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalSeconds))) > 1) return $"{units} seconds";
+                else if ((Convert.ToInt32(Math.Floor(ts.Value.TotalSeconds))) == 1) return $"a second";
+                else return "a moment";
+            }
+
+            /// <summary>
+            /// Converts a TimeSpan to String, showing all hours
+            /// </summary>
+            /// <param name="ts"></param>
+            /// <param name="includeMilliseconds"></param>
+            /// <returns></returns>
+            public static string ConvertToStringWithAllHours(TimeSpan? ts, bool includeMilliseconds = true)
+            {
+                if (!ts.HasValue) return "unknown";
+                else if (includeMilliseconds) return $"{ts.Value.TotalHours:F0}{ts.Value:\\:mm\\:ss\\.fff}";
+                else return $"{ts.Value.TotalHours:F0}{ts.Value:\\:mm\\:ss}";
+            }
+
+            /// <summary>
+            /// Gets an string to 'erase' a line in console, this is a line with spaces
+            /// </summary>
+            /// <returns></returns>
+            public static string GetEmptyConsoleLine()
+                => "".PadRight(Console.BufferWidth);
+
+            /// <summary>
+            /// Returns a string that occupy all console line/s
+            /// </summary>
+            /// <param name="value">The string to write in console</param>
+            /// <param name="allowMultipleLines">To allow print the string in muliple lines or only in one:
+            ///     True: The text can be represented in more than one Console line (fill spaces to the end of last line)
+            ///     False: The text must be represented in only ONE line (truncate to fit or fill spaces to the end of line)
+            /// </param>
+            /// <returns></returns>
+            public static string AdaptTextToConsole(string value, bool allowMultipleLines = true)
+            {
+                int maxWidth = Console.BufferWidth;
+
+                if (allowMultipleLines)
+                {
+                    var lines = Math.DivRem(value.Length, maxWidth, out _) + 1;
+                    maxWidth *= lines;
+                }
+                return AdaptTextToMaxWidth(value, maxWidth);
+            }
+
+            /// <summary>
+            /// Returns a string with exactly maxChars: Truncates string value or fill with spaces to fits exact length
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="maxWidth"></param>
+            /// <param name="append">Text appended when it is truncated. Default: "..."</param>
+            /// <returns></returns>
+            public static string AdaptTextToMaxWidth(string value, int maxWidth, string append = "...")
+            {
+                int len = value.Length;
+
+                if (len == maxWidth) return value;
+                else if (len < maxWidth) return value.PadRight(maxWidth);
+                else return value.Substring(0, maxWidth - append.Length) + append;
+            }
+        }
+
+        /// <summary>
         /// Definition of a Layout for a ProgressBar representation
         /// </summary>
-        public class Layout
+        public class LayoutDefinition
         {
-            //[■■■■■···············] -> ShowProgress
-            //[·······■············] -> ShowMarquee
-            //[■■■■■··+············] -> ShowProgress + ShowMarquee
-            //[■■■■■■■■#■■■········] -> ShowProgress + ShowMarquee (overlapped)
+            /*
+             *  Examples of ProgressBar
+             *
+             *      - Marquee is a Character moving around the ProgressBar
+             *      
+             *      With Progress available (Maximum defined):
+             *          [■■■■■■■■■■■■········] -> Without Marquee
+             *          [■■■■■■■■■■■■····+···] -> With Marquee (in pending space) 
+             *          [■■■■■■■■#■■■········] -> With Marquee (in progress space)
+             *          
+             *      Without Progress available (don't have Maximum):
+             *          [·······■············] -> Marquee is always displayed
+             *
+             */
 
             /// <summary>
             /// ColorString with the 'Starting part' of the ProgressBar
-            /// Default = "[" -> [■■■■■···············]
+            /// Default = "[", DarkBlue -> [■■■■■···············]
             /// </summary>
             public ColorString Start { get; set; } = new ColorString("[", ConsoleColor.DarkBlue);
 
             /// <summary>
             /// ColorString with the 'Ending part' of the ProgressBar
-            /// Default = "]" -> [■■■■■···············]
+            /// Default = "]", DarkBlue -> [■■■■■···············]
             /// </summary>
             public ColorString End { get; set; } = new ColorString("]", ConsoleColor.DarkBlue);
 
             /// <summary>
-            /// ColorCharacter for 'Pending' step (without progress)
-            /// Default = '·' -> [■■■■■···············]
+            /// ColorCharacter for 'Pending' space (without progress)
+            /// Default = '·', DarkGray -> [■■■■■···············]
             /// </summary>
             public ColorCharacter Pending { get; set; } = new ColorCharacter('·', ConsoleColor.DarkGray);
 
             /// <summary>
-            /// ColorCharacter for 'Progress' step
-            /// Default = '■' -> [■■■■■···············]
+            /// ColorCharacter for 'Progress' space
+            /// Default = '■', DarkGreen -> [■■■■■···············]
             /// </summary>
             public ColorCharacter Progress { get; set; } = new ColorCharacter('■', ConsoleColor.DarkGreen);
 
             /// <summary>
             /// ColorCharacter for the 'Marquee' when the ProgressBar don't show Progress 
             /// The Marquee is a char that moves around the ProgressBar
-            /// Default = '■' -> [·······■············]
+            /// Default = '■', Green -> [·······■············]
             /// </summary>
             public ColorCharacter MarqueeAlone { get; set; } = new ColorCharacter('■', ConsoleColor.Green);
 
             /// <summary>
             /// ColorCharacter for the 'Marquee' when it moves over a 'Pending' step when ProgressBar show Progress
             /// The Marquee is a char that moves around the ProgressBar
-            /// Default = '+' -> [■■■■■··+············]
+            /// Default = '·', Yellow -> [■■■■■··+············]
             /// </summary>
             public ColorCharacter MarqueeInProgressPending { get; set; } = new ColorCharacter('·', ConsoleColor.Yellow);
 
             /// <summary>
             /// ColorCharacter for the 'Marquee' when it moves over a 'Progress' step when ProgressBar show Progress
             /// The Marquee is a char that moves around the ProgressBar
-            /// Default = '#' -> [■■■■■■■■#■■■········]
+            /// Default = '■', Yellow -> [■■■■■■■■#■■■········]
             /// </summary>
             public ColorCharacter MarqueeInProgress { get; set; } = new ColorCharacter('■', ConsoleColor.Yellow);
 
@@ -81,9 +174,45 @@ namespace ConsoleProgressBar
 
             /// <summary>
             /// Indentation in each DesctiptionLine
-            /// Default = " -> "
+            /// Default = " -> ", DarkBlue
             /// </summary>
             public ColorString DescriptionLinesIndentation { get; set; } = new ColorString(" -> ", ConsoleColor.DarkBlue);
+
+
+            /// <summary>
+            /// Function to Get the Text to put after ProgressBar, when it does not show Progress
+            /// </summary>
+            public Func<ProgressBar, ColorString> NoProgressTextGetter { get; set; }
+                = (pb) => pb.IsPaused ?
+                            new ColorString($"Paused... Running time: {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)}", ConsoleColor.DarkCyan) :
+                            new ColorString($"Processing... ({pb.Value} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)})", ConsoleColor.Cyan);
+
+            /// <summary>
+            /// Function to Get the Text to put after ProgressBar, when it show Progress
+            /// </summary>
+            public Func<ProgressBar, ColorString> ProgressTextGetter { get; set; }
+                = (pb) => pb.IsPaused ?
+                            new ColorString($"{pb.Value} of {pb.Maximum} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)} (paused)", ConsoleColor.DarkCyan) :
+                            new ColorString($"{pb.Value} of {pb.Maximum} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)}, remaining: {Utils.ConvertToStringAsSumarizedRemainingText(pb.TimeRemaining)}", ConsoleColor.Cyan);
+
+            /// <summary>
+            /// Function to Get the Text to put after ProgressBar, when it is Done (disposed or finished)
+            /// </summary>
+            public Func<ProgressBar, ColorString> DoneTextGetter { get; set; }
+                = (pb) => new ColorString($"Done!", ConsoleColor.DarkYellow);
+
+            /// <summary>
+            /// Function to Get the Description lines to put under ProgressBar
+            /// </summary>
+            public Func<ProgressBar, IEnumerable<ColorString>> DescriptionLinesGetter { get; set; }
+                = (pb) => new ColorString[] { pb.IsPaused ? new ColorString("[Paused]", ConsoleColor.DarkCyan) : new ColorString($"{pb.ElementName}", ConsoleColor.DarkYellow) };
+
+            /// <summary>
+            /// Function to Get the Description lines to put under ProgressBar, when it is Done (disposed or finished)
+            /// </summary>
+            public Func<ProgressBar, IEnumerable<ColorString>> DoneDescriptionLinesGetter { get; set; }
+                = (pb) => new ColorString[] { new ColorString($"{pb.Value} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)} ({Utils.ConvertToStringWithAllHours(pb.TimePerElement)} each one)", ConsoleColor.DarkGray) };
+
         }
 
         /// <summary>
@@ -172,13 +301,13 @@ namespace ConsoleProgressBar
         /// <summary>
         /// Layout of the ProgressBar
         /// </summary>
-        public Layout CurrentLayout { get; set; }
+        public LayoutDefinition Layout { get; set; }
 
         /// <summary>
         /// The Maximum value
         /// Default = 100
         /// </summary>
-        public int Maximum { get; set; } = 100;
+        public int? Maximum { get; set; } = 100;
 
         private int _Value = 0;
         /// <summary>
@@ -192,23 +321,39 @@ namespace ConsoleProgressBar
         }
 
         /// <summary>
+        /// Percentage of progress
+        /// </summary>
+        public int? Percentage => Maximum.HasValue ? (Maximum.Value != 0 ? ((Value * 100) / Maximum.Value) : 100) : (int?)null;
+
+        /// <summary>
+        /// Indicates if the ProgressBar has Progress defined (Maximum defined)
+        /// </summary>
+        public bool HasProgress => Maximum.HasValue;
+
+        /// <summary>
         /// The amount by which to increment the ProgressBar with each call to the PerformStep() method.
         /// Default = 1
         /// </summary>
         public int Step { get; set; } = 1;
 
         /// <summary>
-        /// True for show the Marquee in the ProgressBar
-        /// The Marquee is a char that moves around the ProgressBar
-        /// Default = true
+        /// The Name of the Curent Element
         /// </summary>
-        public bool ShowMarquee { get; set; } = true;
+        public string ElementName { get; set; }
 
+
+        private bool _ShowMarquee = true;
         /// <summary>
-        /// True for show information about Progress in the ProgressBar
+        /// True to show the Marquee in the ProgressBar
+        /// The Marquee is a char that moves around the ProgressBar
+        /// If there are no Progress to represent (undefined Maximum), Marquee is always Displayed
         /// Default = true
         /// </summary>
-        public bool ShowProgress { get; set; } = true;
+        public bool ShowMarquee
+        {
+            get => !HasProgress || _ShowMarquee;
+            set => _ShowMarquee = value;
+        }
 
         /// <summary>
         /// True to Print the ProgressBar always in last Console Line
@@ -216,23 +361,14 @@ namespace ConsoleProgressBar
         /// You can Write at Console and ProgressBar will always be below your lines
         /// Default = true
         /// </summary>
-        public bool KeepInLastLine { get; set; } = true;
+        public bool FixedInBottom { get; set; } = false;
 
         /// <summary>
-        /// Delay for repaint all ProgressBar
+        /// Delay for repaint and recalculate all ProgressBar
         /// Default = 75
         /// </summary>
-        public int RepaintDelay { get; set; } = 75;
+        public int Delay { get; set; } = 75;
 
-        /// <summary>
-        /// The Name of the Curent Element
-        /// </summary>
-        public string CurrentElementName { get; set; }
-
-        /// <summary>
-        /// Percentage of progress
-        /// </summary>
-        public int Percentage => Maximum != 0 ? ((Value * 100) / Maximum) : 100;
 
         /// <summary>
         /// True if ProgressBar is Started
@@ -247,81 +383,27 @@ namespace ConsoleProgressBar
         /// <summary>
         /// True if ProgresBar is Done: when disposing or Progress is finished
         /// </summary>
-        public bool IsDone => CancelThread || (ShowProgress && Value == Maximum);
+        public bool IsDone => CancelThread || (HasProgress && Value == Maximum);
 
         /// <summary>
         /// Processing time (time paused excluded)
         /// </summary>
-        public TimeSpan ProcessingTime => ProgressStopwatch.Elapsed;
+        public TimeSpan TimeProcessing => ProgressStopwatch.Elapsed;
 
         /// <summary>
         /// Processing time per element (median)
         /// </summary>
-        public TimeSpan TimePerElement => new TimeSpan(TicksPerElement);
+        public TimeSpan? TimePerElement => TicksPerElement.HasValue ? new TimeSpan(TicksPerElement.Value) : (TimeSpan?)null;
 
         /// <summary>
         /// Estimated time finish (to Value = Maximum)
         /// </summary>
-        public TimeSpan? RemainingTime { get; private set; } = null;
+        public TimeSpan? TimeRemaining => TicksRemaining.HasValue ? new TimeSpan(TicksRemaining.Value) : (TimeSpan?)null;
 
         /// <summary>
-        /// Function to Convert RemainingTime TimeSpan to String
+        /// A Lock for Writing to Console
         /// </summary>
-        public Func<TimeSpan?, string> RemainingTimeSpanToStringConverter { get; set; }
-            = (ts) =>
-            {
-                int units;
-                if (!ts.HasValue) return "unknown";
-                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalDays))) > 1) return $"{units} days";
-                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalDays))) == 1) return $"{units} day";
-                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalHours))) > 1) return $"{units} hours";
-                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalHours))) == 1) return $"{units} hour";
-                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalMinutes))) > 1) return $"{units} minutes";
-                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalMinutes))) == 1) return $"{units} minute";
-                else if ((units = Convert.ToInt32(Math.Round(ts.Value.TotalSeconds))) > 1) return $"{units} seconds";
-                else if ((units = Convert.ToInt32(Math.Floor(ts.Value.TotalSeconds))) == 1) return $"{units} second";
-                else return "a moment";
-            };
-
-        /// <summary>
-        /// Function to Convert Processing time to String
-        /// </summary>
-        public Func<TimeSpan, string> ProcessTimeSpanToStringConverter { get; set; }
-            = (ts) => $"{ts.TotalHours:F0}{ts:\\:mm\\:ss\\.fff}";
-
-        /// <summary>
-        /// Function to Get the Text to put after ProgressBar, when it does not show Progress
-        /// </summary>
-        public Func<ProgressBar, ColorString> UndefinedProgressTextGetter { get; set; }
-            = (pb) => pb.IsPaused ?
-                        new ColorString($"Paused... Running time: {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)}", ConsoleColor.DarkCyan) :
-                        new ColorString($"Processing... ({pb.Value} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)})", ConsoleColor.Cyan);
-
-        /// <summary>
-        /// Function to Get the Text to put after ProgressBar, when it show Progress
-        /// </summary>
-        public Func<ProgressBar, ColorString> ProgressTextGetter { get; set; }
-            = (pb) => pb.IsPaused ?
-                        new ColorString($"{pb.Value} of {pb.Maximum} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)} (paused)", ConsoleColor.DarkCyan) :
-                        new ColorString($"{pb.Value} of {pb.Maximum} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)}, remaining: {pb.RemainingTimeSpanToStringConverter?.Invoke(pb.RemainingTime)}", ConsoleColor.Cyan);
-
-        /// <summary>
-        /// Function to Get the Text to put after ProgressBar, when it is Done (disposed or finished)
-        /// </summary>
-        public Func<ProgressBar, ColorString> DoneTextGetter { get; set; }
-            = (pb) => new ColorString($"Done!", ConsoleColor.DarkYellow);
-
-        /// <summary>
-        /// Function to Get the Description lines to put under ProgressBar
-        /// </summary>
-        public Func<ProgressBar, IEnumerable<ColorString>> DescriptionLinesGetter { get; set; }
-            = (pb) => new ColorString[] { pb.IsPaused ? new ColorString("[Paused]", ConsoleColor.DarkCyan) : new ColorString($"{pb.CurrentElementName}", ConsoleColor.DarkYellow) };
-
-        /// <summary>
-        /// Function to Get the Description lines to put under ProgressBar, when it is Done (disposed or finished)
-        /// </summary>
-        public Func<ProgressBar, IEnumerable<ColorString>> DoneDescriptionLinesGetter { get; set; }
-            = (pb) => new ColorString[] { new ColorString($"{pb.Value} in {pb.ProcessTimeSpanToStringConverter?.Invoke(pb.ProcessingTime)} ({pb.ProcessTimeSpanToStringConverter?.Invoke(pb.TimePerElement)} each one)", ConsoleColor.DarkGray) };
+        public static readonly object ConsoleWriterLock = new object();
 
 
         private int MarqueePosition { get; set; } = -1;
@@ -332,9 +414,19 @@ namespace ConsoleProgressBar
         private bool CancelThread { get; set; }
 
         private Stopwatch ProgressStopwatch { get; set; }
-        private long TicksPerElement { get; set; }
+        private long? TicksCompletedElements { get; set; }
+        private long? TicksPerElement => TicksCompletedElements.HasValue && Value > 0 ? TicksCompletedElements.Value / Value : (long?)null;
+        private long? TicksRemaining
+        {
+            get
+            {
+                if (!Maximum.HasValue || !TicksPerElement.HasValue) return (long?)null;
+                long currentTicks = ProgressStopwatch.ElapsedTicks;
+                long totalTicks = TicksPerElement.Value * Maximum.Value;
+                return Math.Max(totalTicks - currentTicks, 0);
+            }
+        }
 
-        public static readonly object ConsoleWriterLock = new object();
         private int _ConsoleRow = -1;
         private int _LastLinesWrited = -1;
 
@@ -343,10 +435,10 @@ namespace ConsoleProgressBar
         /// </summary>
         /// <param name="autoStart">True if ProgressBar starts automatically</param>
         /// <param name="layout">The layout to use in the ProgressBar</param>
-        public ProgressBar(bool autoStart = true, Layout layout = null)
+        public ProgressBar(bool autoStart = true, LayoutDefinition layout = null)
         {
             ProgressStopwatch = new Stopwatch();
-            CurrentLayout = layout ?? new Layout();
+            Layout = layout ?? new LayoutDefinition();
             if (autoStart)
                 Start();
         }
@@ -356,7 +448,7 @@ namespace ConsoleProgressBar
         /// </summary>
         public void Start()
         {
-            PrintProgressBar();
+            Print();
             if (IsStarted)
                 Resume();
             else
@@ -372,8 +464,8 @@ namespace ConsoleProgressBar
                               try
                               {
                                   UpdateMarqueePosition();
-                                  PrintProgressBar();
-                                  Task.Delay(RepaintDelay).Wait();
+                                  Print();
+                                  Task.Delay(Delay).Wait();
                               }
                               catch { }
                           }
@@ -393,7 +485,7 @@ namespace ConsoleProgressBar
         {
             IsPaused = true;
             ProgressStopwatch.Stop();
-            PrintProgressBar();
+            Print();
         }
 
         /// <summary>
@@ -403,7 +495,7 @@ namespace ConsoleProgressBar
         {
             ProgressStopwatch.Start();
             IsPaused = false;
-            PrintProgressBar();
+            Print();
         }
 
         private void SetValue(int value)
@@ -411,7 +503,7 @@ namespace ConsoleProgressBar
             if (value > Maximum)
                 Maximum = value;
             _Value = value;
-            UpdateRemainingTime();
+            TicksCompletedElements = value > 0 ? ProgressStopwatch.ElapsedTicks : (long?)null;
         }
 
         /// <summary>
@@ -420,22 +512,19 @@ namespace ConsoleProgressBar
         /// <param name="newElementName">The name of the new Element</param>
         public void PerformStep(string newElementName = null)
         {
-            CurrentElementName = newElementName;
+            ElementName = newElementName;
             Value += Step;
         }
 
-        private void UpdateRemainingTime()
-        {
-            TicksPerElement = Value > 0 ? (long)Math.Round((decimal)ProgressStopwatch.ElapsedTicks / Value) : ProgressStopwatch.ElapsedTicks;
-            RemainingTime = Value == 0 ? null as TimeSpan? : new TimeSpan(TicksPerElement * (Maximum - Value));
-        }
-
-        public void RemoveProgressBar()
+        /// <summary>
+        /// Unprints (remove) from Console last ProgressBar printed
+        /// </summary>
+        public void Unprint()
         {
             if (_ConsoleRow < 0 || _LastLinesWrited <= 0)
                 return;
 
-            string emptyLine = AdaptTextToMaxWidth("", Console.BufferWidth);
+            string emptyLine = Utils.GetEmptyConsoleLine();
 
             //Lock Write to console
             lock (ConsoleWriterLock)
@@ -463,10 +552,26 @@ namespace ConsoleProgressBar
                     Console.CursorVisible = oldCursorVisible;
             }
         }
-
-        public void PrintProgressBar()
+        public void WriteLine(string value, bool truncateToOneLine = true)
         {
+            string text = Utils.AdaptTextToConsole(value, !truncateToOneLine);
+
+            //Lock Write to console
+            lock (ConsoleWriterLock)
+                Console.WriteLine(text);
+
+            if (FixedInBottom && _LastLinesWrited > 0 && _ConsoleRow - Console.CursorTop <= 1)
+                Print();
+        }
+
+        /// <summary>
+        /// Prints in Console the ProgressBar
+        /// </summary>
+        public void Print()
+        {
+            int oldLines = _LastLinesWrited;
             List<Action> actionsProgressBar = GetConsoleActionsForProgressBarAndText();
+            string emptyLine = Utils.GetEmptyConsoleLine();
 
             //Lock Write to console
             lock (ConsoleWriterLock)
@@ -480,15 +585,33 @@ namespace ConsoleProgressBar
                 //Hide Cursor
                 Console.CursorVisible = false;
 
-                //Remove line
-                if (KeepInLastLine)
-                    Console.WriteLine(AdaptTextToMaxWidth("", Console.BufferWidth));
-
                 //Position
-                if (_ConsoleRow < 0)
+                if (FixedInBottom)
+                {
+                    if (_ConsoleRow < Console.WindowHeight - _LastLinesWrited - 1)
+                    {
+                        if (_ConsoleRow >= 0 && oldLines > 0)
+                        {
+                            //There is an old ProgressBar not fixed in Bottom
+                            Console.SetCursorPosition(0, _ConsoleRow);
+                            for (int i = 0; i < oldLines; i++)
+                                Console.WriteLine(emptyLine);
+                            if (oldCursorTop == _ConsoleRow + oldLines)
+                                oldCursorTop -= oldLines;
+                        }
+                        _ConsoleRow = Console.WindowHeight - _LastLinesWrited - 1;
+                    }
+                    int scrollMargin = (Console.WindowHeight - _LastLinesWrited) / 3;
+                    if (_ConsoleRow - oldCursorTop <= scrollMargin / 2)
+                    {
+                        //oldCursorTop is near or over: Keep a margin between Text and ProgressBar (avoid flickering)
+                        for (int i = oldCursorTop; i < _ConsoleRow + _LastLinesWrited; i++)
+                            Console.WriteLine(emptyLine);
+                        _ConsoleRow = oldCursorTop + scrollMargin;
+                    }
+                }
+                else if (_ConsoleRow < 0)
                     _ConsoleRow = oldCursorTop;
-                if (KeepInLastLine)
-                    _ConsoleRow = oldCursorTop + 1;
                 Console.SetCursorPosition(0, _ConsoleRow);
 
                 //ProgressBar and Text
@@ -511,63 +634,61 @@ namespace ConsoleProgressBar
         private List<Action> GetConsoleActionsForProgressBarAndText()
         {
             int oldLinesWrited = _LastLinesWrited;
+            string emptyLine = Utils.GetEmptyConsoleLine();
 
             // ProgressBar
             List<Action> list = GetConsoleActionsForProgressBar(true);
 
             // Text in same line
             ColorString coloredText = null;
-            var maxTextLenght = Console.BufferWidth - CurrentLayout.TotalLength;
+            var maxTextLenght = Console.BufferWidth - Layout.TotalLength;
             if (maxTextLenght >= 10) //Text will be printed if there are 10 chars or more
             {
                 if (IsDone)
-                    coloredText = DoneTextGetter?.Invoke(this);
-                else if (ShowProgress)
-                    coloredText = ProgressTextGetter?.Invoke(this);
+                    coloredText = Layout.DoneTextGetter?.Invoke(this);
+                else if (HasProgress)
+                    coloredText = Layout.ProgressTextGetter?.Invoke(this);
                 else
-                    coloredText = UndefinedProgressTextGetter?.Invoke(this);
+                    coloredText = Layout.NoProgressTextGetter?.Invoke(this);
                 if (!string.IsNullOrEmpty(coloredText?.Value))
-                    list.AddRange(coloredText.GetConsoleWriteActions(s => AdaptTextToMaxWidth(" " + s, maxTextLenght)));
+                    list.AddRange(coloredText.GetConsoleWriteActions(s => Utils.AdaptTextToMaxWidth(" " + s, maxTextLenght)));
             }
             list.Add(() => Console.Write(Environment.NewLine));
             _LastLinesWrited = 1;
 
             // Description
-            var descriptionLinesGetter = IsDone ? DoneDescriptionLinesGetter : DescriptionLinesGetter;
-            foreach (var line in descriptionLinesGetter?.Invoke(this) ?? new ColorString[0])
+            var descriptionLinesGetter = IsDone ? Layout.DoneDescriptionLinesGetter : Layout.DescriptionLinesGetter;
+            if (descriptionLinesGetter != null)
             {
-                int indentationLen = CurrentLayout.DescriptionLinesIndentation.Value?.Length ?? 0;
-                if (indentationLen > 0)
-                    list.AddRange(CurrentLayout.DescriptionLinesIndentation.GetConsoleWriteActions());
+                foreach (var line in descriptionLinesGetter.Invoke(this))
+                {
+                    if (line != null)
+                    {
+                        int indentationLen = Layout.DescriptionLinesIndentation.Value?.Length ?? 0;
+                        if (indentationLen > 0)
+                            list.AddRange(Layout.DescriptionLinesIndentation.GetConsoleWriteActions());
 
-                list.AddRange(line.GetConsoleWriteActions(s => AdaptTextToMaxWidth(s, Console.BufferWidth - indentationLen)));
-                list.Add(() => Console.Write(Environment.NewLine));
-                _LastLinesWrited++;
+                        list.AddRange(line.GetConsoleWriteActions(s => Utils.AdaptTextToMaxWidth(s, Console.BufferWidth - indentationLen)));
+                        list.Add(() => Console.Write(Environment.NewLine));
+                        _LastLinesWrited++;
+                    }
+                }
             }
 
             // Clear old lines
             if (oldLinesWrited > _LastLinesWrited)
             {
-                for (int i = 0; i < _LastLinesWrited - oldLinesWrited; i++)
-                    list.Add(() => Console.WriteLine(AdaptTextToMaxWidth("", Console.BufferWidth)));
+                for (int i = 0; i < oldLinesWrited - _LastLinesWrited; i++)
+                    list.Add(() => Console.WriteLine(emptyLine));
             }
             return list;
         }
 
-        public static string AdaptTextToMaxWidth(string value, int maxChars)
-        {
-            const string append = "...";
-
-            //Truncate to fit in a line
-            string textTruncated = value.Length <= maxChars ? value : value.Substring(0, maxChars - append.Length) + append;
-            //Add spaces to fill all line
-            return textTruncated.PadRight(maxChars);
-        }
 
         private void UpdateMarqueePosition()
         {
             int newProgressPosition = MarqueePosition + MarqueeIncrement;
-            if (newProgressPosition < 0 || newProgressPosition >= CurrentLayout.InnerLength)
+            if (newProgressPosition < 0 || newProgressPosition >= Layout.InnerLength)
                 MarqueeIncrement *= -1;
 
             MarqueePosition += MarqueeIncrement;
@@ -576,39 +697,35 @@ namespace ConsoleProgressBar
         private List<Action> GetConsoleActionsForProgressBar(bool restoreColors)
         {
             var list = new List<Action>();
-            //[■■■■■···············] -> ShowProgress
-            //[·······■············] -> ShowMarquee
-            //[■■■■■··+············] -> ShowProgress + ShowMarquee
-            //[■■■■■■■■#■■■········] -> ShowProgress + ShowMarquee (overlapped)
 
             ConsoleColor? oldForegroundColor = restoreColors ? Console.ForegroundColor : (ConsoleColor?)null;
             ConsoleColor? oldBackgroundColor = restoreColors ? Console.BackgroundColor : (ConsoleColor?)null;
 
-            int percentageLenght = ShowProgress ? Convert.ToInt32(Percentage / (100f / CurrentLayout.InnerLength)) : 0;
+            int percentageLenght = HasProgress ? Convert.ToInt32(Percentage / (100f / Layout.InnerLength)) : 0;
 
             //Start
-            list.AddRange(CurrentLayout.Start.GetConsoleWriteActions());
+            list.AddRange(Layout.Start.GetConsoleWriteActions());
 
             //Body
-            for (int i = 0; i < CurrentLayout.InnerLength; i++)
+            for (int i = 0; i < Layout.InnerLength; i++)
             {
                 ColorCharacter c;
                 if (i == MarqueePosition && ShowMarquee)
                 {
-                    if (ShowProgress)
-                        c = (i < percentageLenght) ? CurrentLayout.MarqueeInProgress : CurrentLayout.MarqueeInProgressPending;
+                    if (HasProgress)
+                        c = (i < percentageLenght) ? Layout.MarqueeInProgress : Layout.MarqueeInProgressPending;
                     else
-                        c = CurrentLayout.MarqueeAlone;
+                        c = Layout.MarqueeAlone;
                 }
                 else
                 {
-                    c = (i < percentageLenght) ? CurrentLayout.Progress : CurrentLayout.Pending;
+                    c = (i < percentageLenght) ? Layout.Progress : Layout.Pending;
                 }
                 list.AddRange(c.GetConsoleWriteActions());
             }
 
             //End
-            list.AddRange(CurrentLayout.End.GetConsoleWriteActions());
+            list.AddRange(Layout.End.GetConsoleWriteActions());
 
             if (restoreColors)
             {
@@ -625,14 +742,14 @@ namespace ConsoleProgressBar
         {
             CancelThread = true;
             ShowMarquee = false;
-            UpdateRemainingTime();
-            PrintProgressBar();
-            if (KeepInLastLine && _LastLinesWrited > 0 && _ConsoleRow >= 0)
-                Console.CursorTop = _ConsoleRow + _LastLinesWrited; 
+            //UpdateRemainingTime();
+            Print();
+            if (FixedInBottom && _LastLinesWrited > 0 && _ConsoleRow >= 0)
+                Console.CursorTop = _ConsoleRow + _LastLinesWrited;
 
             if (ProgressStopwatch.IsRunning)
-                    ProgressStopwatch.Stop();
-                ProgressStopwatch.Reset();
-            }
+                ProgressStopwatch.Stop();
+            ProgressStopwatch.Reset();
         }
     }
+}
