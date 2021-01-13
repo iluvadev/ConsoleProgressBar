@@ -1,7 +1,10 @@
 # ConsoleProgressBar
 A ProgressBar for Console, in C# 
 It needs only a file: ConsoleProgressBar.cs
+
 (Readme under construction)
+![Screencapture ConsoleProgressBar Demo](Images/ProgressBarConsole-Demo.gif)
+
 
 ![Screencapture ConsoleProgressBar with Default Config](Images/ProgressBarConsole-Default.gif)
 Code:

@@ -1,5 +1,10 @@
-﻿// Copyright (c) 2020, iluvadev, and released under MIT License.  This can be found in the root of this distribution. 
-
+﻿// Description: ProgressBar for Console Applications, with advanced features.
+// Project site: https://github.com/iluvadev/ConsoleProgressBar
+// Issues: https://github.com/iluvadev/ConsoleProgressBar/issues
+// License (MIT): https://github.com/iluvadev/ConsoleProgressBar/blob/main/LICENSE
+//
+// Copyright (c) 2021, iluvadev, and released under MIT License.
+//
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -442,10 +447,13 @@ namespace ConsoleProgressBar
         /// <summary>
         /// Creates an instance of ConsoleProgressBar
         /// </summary>
+        /// <param name="initialPosition">Initial position of the ProgressBar</param>
         /// <param name="autoStart">True if ProgressBar starts automatically</param>
         /// <param name="layout">The layout to use in the ProgressBar</param>
-        public ProgressBar(bool autoStart = true, LayoutDefinition layout = null)
+        public ProgressBar(int? initialPosition = null, bool autoStart = true, LayoutDefinition layout = null)
         {
+            if (initialPosition.HasValue)
+                _ConsoleRow = initialPosition.Value;
             ProgressStopwatch = new Stopwatch();
             Layout = layout ?? new LayoutDefinition();
             if (autoStart)
