@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -254,31 +255,22 @@ namespace ConsoleProgressBar
                 var list = new List<Action>();
                 if (repetitions < 1)
                     return list;
-                ConsoleColor? oldForegroundColor = null;
-                ConsoleColor? oldBackgroundColor = null;
 
                 if (ForegroundColor.HasValue)
-                {
                     list.Add(() => Console.ForegroundColor = ForegroundColor.Value);
-                    oldForegroundColor = Console.ForegroundColor;
-                }
 
                 if (BackgroundColor.HasValue)
-                {
                     list.Add(() => Console.BackgroundColor = BackgroundColor.Value);
-                    oldBackgroundColor = Console.BackgroundColor;
-                }
 
                 T transformedValue = Value;
                 if (valueTransformer != null)
                     transformedValue = valueTransformer.Invoke(Value);
-                for (int i = 0; i < repetitions; i++)
-                    list.Add(() => Console.Write(transformedValue));
 
-                if (oldForegroundColor.HasValue)
-                    list.Add(() => Console.ForegroundColor = oldForegroundColor.Value);
-                if (oldBackgroundColor.HasValue)
-                    list.Add(() => Console.BackgroundColor = oldBackgroundColor.Value);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < repetitions; i++)
+                    sb.Append(transformedValue);
+
+                list.Add(() => Console.Write(sb.ToString()));
 
                 return list;
             }
@@ -445,7 +437,7 @@ namespace ConsoleProgressBar
         }
 
         private int _ConsoleRow = -1;
-        private int _LastLinesWrited = -1;
+        private int _NumberLastLinesWritten = -1;
 
         /// <summary>
         /// Creates an instance of ConsoleProgressBar
@@ -529,22 +521,32 @@ namespace ConsoleProgressBar
         /// <param name="newElementName">The name of the new Element</param>
         public void PerformStep(string newElementName = null)
         {
-            ElementName = newElementName;
+            if (newElementName != null)
+                ElementName = newElementName;
             Value += Step;
         }
 
-
-        public void WriteLine(string value, bool truncateToOneLine = true)
+        public void WriteLine(ColorString colorString, bool truncateToOneLine = true)
         {
-            string text = Utils.AdaptTextToConsole(value, !truncateToOneLine);
-
-            //Lock Write to console
+            var actions = colorString.GetConsoleWriteActions(s => Utils.AdaptTextToConsole(s, !truncateToOneLine) + Environment.NewLine);
             lock (ConsoleWriterLock)
-                Console.WriteLine(text);
-
-            if (FixedInBottom && _LastLinesWrited > 0 && _ConsoleRow - Console.CursorTop <= 1)
+            {
+                ConsoleColor? oldForegroundColor = colorString.ForegroundColor.HasValue ? Console.ForegroundColor : (ConsoleColor?)null;
+                ConsoleColor? oldBackgroundColor = colorString.BackgroundColor.HasValue ? Console.BackgroundColor : (ConsoleColor?)null; ;
+                actions.ForEach(a => a.Invoke());
+                if (oldForegroundColor.HasValue) Console.ForegroundColor = oldForegroundColor.Value;
+                if (oldBackgroundColor.HasValue) Console.BackgroundColor = oldBackgroundColor.Value;
+            }
+            //If FixedInBottom and we written over the ProgressBar -> Print it again
+            if (FixedInBottom && _NumberLastLinesWritten > 0 && Console.CursorTop >= _ConsoleRow)
                 Print();
         }
+
+        public void WriteLine(string value, bool truncateToOneLine = true)
+            => WriteLine(new ColorString(value), truncateToOneLine);
+
+        public void WriteLine(string value, ConsoleColor? foregroundColor = null, ConsoleColor? backgroundColor = null, bool truncateToOneLine = true)
+            => WriteLine(new ColorString(value, foregroundColor, backgroundColor), truncateToOneLine);
 
         /// <summary>
         /// Prints in Console the ProgressBar
@@ -569,16 +571,33 @@ namespace ConsoleProgressBar
                 //Position
                 if (FixedInBottom)
                 {
-
-                    if (_ConsoleRow < Console.WindowHeight - _LastLinesWrited - 1)
+                    if (_ConsoleRow < Console.WindowHeight - _NumberLastLinesWritten)
                     {
-                        _ConsoleRow = Console.WindowHeight - _LastLinesWrited - 1;
+                        int newConsoleRow = Console.WindowHeight - _NumberLastLinesWritten;
+                        if (_NumberLastLinesWritten > 0)
+                        {
+                            //Clear old ProgressBar
+                            Console.SetCursorPosition(0, _ConsoleRow);
+                            for (int i = _ConsoleRow; i < newConsoleRow; i++)
+                                Console.WriteLine(emptyLine);
+                        }
+                        _ConsoleRow = newConsoleRow;
                     }
-                    int scrollMargin = Math.Max((Console.WindowHeight - _LastLinesWrited) / 3, 4);
+                    //if (oldCursorTop >= _ConsoleRow)
+                    //{
+                    //    //oldCursorTop is near or over: Keep 2 empty lines between Text and ProgressBar (avoid flickering)
+                    //    Console.SetCursorPosition(0, oldCursorTop);
+                    //    Console.WriteLine(emptyLine);
+                    //    Console.WriteLine(emptyLine);
+                    //    _ConsoleRow = oldCursorTop + 2;
+                    //}
+
+                    int scrollMargin = Math.Max((Console.WindowHeight - _NumberLastLinesWritten) / 3, 2);
                     if (_ConsoleRow - oldCursorTop <= scrollMargin / 2)
                     {
                         //oldCursorTop is near or over: Keep a margin between Text and ProgressBar (avoid flickering)
-                        for (int i = oldCursorTop; i < _ConsoleRow + _LastLinesWrited; i++)
+                        Console.SetCursorPosition(0, oldCursorTop);
+                        for (int i = oldCursorTop; i < _ConsoleRow + _NumberLastLinesWritten; i++)
                             Console.WriteLine(emptyLine);
                         _ConsoleRow = oldCursorTop + scrollMargin;
                     }
@@ -608,7 +627,7 @@ namespace ConsoleProgressBar
         /// </summary>
         public void Unprint()
         {
-            if (_ConsoleRow < 0 || _LastLinesWrited <= 0)
+            if (_ConsoleRow < 0 || _NumberLastLinesWritten <= 0)
                 return;
 
             string emptyLine = Utils.GetEmptyConsoleLine();
@@ -631,7 +650,7 @@ namespace ConsoleProgressBar
                 Console.SetCursorPosition(0, initialRow);
 
                 //Remove lines
-                for (int i = initialRow; i < _ConsoleRow + _LastLinesWrited; i++)
+                for (int i = initialRow; i < _ConsoleRow + _NumberLastLinesWritten; i++)
                     Console.WriteLine(emptyLine);
 
                 // Restore Cursor Position
@@ -645,7 +664,7 @@ namespace ConsoleProgressBar
 
         private List<Action> GetConsoleActionsForProgressBarAndText()
         {
-            int oldLinesWrited = _LastLinesWrited;
+            int oldLinesWrited = _NumberLastLinesWritten;
             string emptyLine = Utils.GetEmptyConsoleLine();
 
             // ProgressBar
@@ -666,7 +685,7 @@ namespace ConsoleProgressBar
                     list.AddRange(coloredText.GetConsoleWriteActions(s => Utils.AdaptTextToMaxWidth(" " + s, maxTextLenght)));
             }
             list.Add(() => Console.Write(Environment.NewLine));
-            _LastLinesWrited = 1;
+            _NumberLastLinesWritten = 1;
 
             // Description
             var descriptionLinesGetter = IsDone ? Layout.DoneDescriptionLinesGetter : Layout.DescriptionLinesGetter;
@@ -682,15 +701,15 @@ namespace ConsoleProgressBar
 
                         list.AddRange(line.GetConsoleWriteActions(s => Utils.AdaptTextToMaxWidth(s, Console.BufferWidth - indentationLen)));
                         list.Add(() => Console.Write(Environment.NewLine));
-                        _LastLinesWrited++;
+                        _NumberLastLinesWritten++;
                     }
                 }
             }
 
             // Clear old lines
-            if (oldLinesWrited > _LastLinesWrited)
+            if (oldLinesWrited > _NumberLastLinesWritten)
             {
-                for (int i = 0; i < oldLinesWrited - _LastLinesWrited; i++)
+                for (int i = 0; i < oldLinesWrited - _NumberLastLinesWritten; i++)
                     list.Add(() => Console.WriteLine(emptyLine));
             }
             return list;
@@ -787,8 +806,8 @@ namespace ConsoleProgressBar
             ShowMarquee = false;
             //UpdateRemainingTime();
             Print();
-            if (FixedInBottom && _LastLinesWrited > 0 && _ConsoleRow >= 0)
-                Console.CursorTop = _ConsoleRow + _LastLinesWrited;
+            if (FixedInBottom && _NumberLastLinesWritten > 0 && _ConsoleRow >= 0)
+                Console.CursorTop = _ConsoleRow + _NumberLastLinesWritten;
 
             if (ProgressStopwatch.IsRunning)
                 ProgressStopwatch.Stop();

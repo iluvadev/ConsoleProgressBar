@@ -17,7 +17,7 @@ namespace ConsoleProgressBarDemo
             var elementNames = new List<string>();
             for (int i = 0; i < 1000; i++)
             {
-                var randomNum = random.Next(200)+20;
+                var randomNum = random.Next(200) + 20;
                 string elementName = "";
                 for (int j = 0; j < randomNum; j++)
                     elementName += (char)(random.Next(25) + 65);
@@ -70,17 +70,14 @@ namespace ConsoleProgressBarDemo
             Console.ReadKey();
             using (var pg = new ProgressBar() { Maximum = 500, FixedInBottom = true })
             {
+                pg.Layout.DescriptionLinesGetter = null;
                 for (int i = 0; i < 500; i++)
                 {
                     string elementName = elementNames[i % elementNames.Count];
-                    pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", false);
-
-                    pg.Layout.DescriptionLinesGetter = null;
-                    pg.ElementName = elementName;
-                    Task.Delay(100).Wait();
-                    pg.PerformStep();
-                    if ((i + 1) % 100 == 0)
-                        pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i + 1} - in {ProgressBar.Utils.ConvertToStringWithAllHours(pg.TimeProcessing, false)}");
+                    pg.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: Start processing {i} - {elementName}", false);
+                    Task.Delay(10).Wait();
+                    pg.PerformStep(elementName);
+                    pg.WriteLine($"> [{DateTime.Now.ToString("HH:mm:ss.fff")}]: End processing {i} - {elementName}", false);
                 }
             }
             Console.ReadKey();
