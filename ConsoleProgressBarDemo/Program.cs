@@ -38,8 +38,12 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(1) { Maximum = 500, ShowMarquee = false })
                 {
-                    pb.Layout.DescriptionLinesGetter = null;
-                    pb.Layout.DoneDescriptionLinesGetter = null;
+                    pb.Description.Clear();
+                    pb.Description.Done
+                        .Add()
+                        .Value(p => $"Progress Bar 1: {p.Value} done in {ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)}")
+                        .ForegroundColor(ConsoleColor.DarkBlue);
+
 
                     pb.Layout.InnerLength = Console.BufferWidth;
                     pb.Layout.Start.Value = pb.Layout.End.Value = "";
@@ -51,10 +55,6 @@ namespace ConsoleProgressBarDemo
                     pb.Layout.MarqueeAlone.Value = '─';
 
                     pb.Layout.DescriptionLinesIndentation.Value = "  └───> ";
-                    pb.Layout.DoneDescriptionLinesGetter = (p => new List<ProgressBar.ColorString>
-                    {
-                        new ProgressBar.ColorString($"Progress Bar 1: {p.Value} done in {ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)}", ConsoleColor.DarkBlue)
-                    });
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(10).Wait();
@@ -68,13 +68,14 @@ namespace ConsoleProgressBarDemo
             Console.Write("ProgressBar 2:");
             Task taskPb2 = new Task(() =>
             {
-                using (var pb = new ProgressBar(5) { Maximum = 500})
+                using (var pb = new ProgressBar(5) { Maximum = 500 })
                 {
-                    pb.Layout.DescriptionLinesGetter = null;
-                    pb.Layout.DoneDescriptionLinesGetter = null;
-                    pb.Layout.DoneTextGetter = (p =>
-                        new ProgressBar.ColorString($"Progress Bar 2: {p.Value} elements processed in {ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)}",
-                                ConsoleColor.Green));
+                    pb.Text.Done
+                        .Value(p => $"Progress Bar 2: {p.Value} elements processed in {ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)}")
+                        .ForegroundColor(p => ConsoleColor.Green);
+
+                    pb.Description.Clear();
+
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(15).Wait();
@@ -88,7 +89,7 @@ namespace ConsoleProgressBarDemo
             Console.Write("ProgressBar 3:");
             Task taskPb3 = new Task(() =>
             {
-                using (var pb = new ProgressBar(9) { Maximum = 500})
+                using (var pb = new ProgressBar(9) { Maximum = 500 })
                 {
                     pb.Layout.InnerLength = Console.BufferWidth - 2;
                     pb.Layout.Pending.Value =
@@ -113,8 +114,10 @@ namespace ConsoleProgressBarDemo
                     pb.Layout.Start.Value = pb.Layout.End.Value = "";
                     pb.Layout.Pending.Value = pb.Layout.MarqueeAlone.Value;
                     pb.Layout.Pending.ForegroundColor = ConsoleColor.DarkMagenta;
-                    
-                    pb.Layout.DescriptionLinesGetter = null;
+
+                    pb.Description.Clear();
+                    pb.Description.Processing.Add().Value(p => p.Value.ToString()).ForegroundColor(ConsoleColor.Yellow);
+                    pb.Description.Processing.Add().Value(p => ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)).ForegroundColor(ConsoleColor.Cyan);
 
                     for (int i = 0; i < 500; i++)
                     {
@@ -150,7 +153,8 @@ namespace ConsoleProgressBarDemo
             Console.ReadKey();
             using (var pb = new ProgressBar() { Maximum = 500, FixedInBottom = true })
             {
-                pb.Layout.DescriptionLinesGetter = null;
+                pb.Description.Clear();
+
                 for (int i = 0; i < 500; i++)
                 {
                     string elementName = elementNames[i % elementNames.Count];

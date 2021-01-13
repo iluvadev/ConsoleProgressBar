@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -184,41 +185,177 @@ namespace ConsoleProgressBar
             /// </summary>
             public ColorString DescriptionLinesIndentation { get; set; } = new ColorString(" -> ", ConsoleColor.DarkBlue);
 
+        }
 
-            /// <summary>
-            /// Function to Get the Text to put after ProgressBar, when it does not show Progress
-            /// </summary>
-            public Func<ProgressBar, ColorString> NoProgressTextGetter { get; set; }
-                = (pb) => pb.IsPaused ?
-                            new ColorString($"Paused... Running time: {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)}", ConsoleColor.DarkCyan) :
-                            new ColorString($"Processing... ({pb.Value} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)})", ConsoleColor.Cyan);
+        public class TextLineDefinition
+        {
+            private Func<ProgressBar, bool> ShowGetter { get; set; }
+            private Func<ProgressBar, string> ValueGetter { get; set; }
+            private Func<ProgressBar, ConsoleColor> ForegroundColorGetter { get; set; }
+            private Func<ProgressBar, ConsoleColor> BackgroundColorGetter { get; set; }
 
-            /// <summary>
-            /// Function to Get the Text to put after ProgressBar, when it show Progress
-            /// </summary>
-            public Func<ProgressBar, ColorString> ProgressTextGetter { get; set; }
-                = (pb) => pb.IsPaused ?
-                            new ColorString($"{pb.Value} of {pb.Maximum} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)} (paused)", ConsoleColor.DarkCyan) :
-                            new ColorString($"{pb.Value} of {pb.Maximum} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)}, remaining: {Utils.ConvertToStringAsSumarizedRemainingText(pb.TimeRemaining)}", ConsoleColor.Cyan);
+            public TextLineDefinition Show(bool show)
+                => Show(pb => show);
 
-            /// <summary>
-            /// Function to Get the Text to put after ProgressBar, when it is Done (disposed or finished)
-            /// </summary>
-            public Func<ProgressBar, ColorString> DoneTextGetter { get; set; }
-                = (pb) => new ColorString($"Done!", ConsoleColor.DarkYellow);
+            public TextLineDefinition Show(Func<ProgressBar, bool> showGetter)
+            {
+                ShowGetter = showGetter;
+                return this;
+            }
 
-            /// <summary>
-            /// Function to Get the Description lines to put under ProgressBar
-            /// </summary>
-            public Func<ProgressBar, IEnumerable<ColorString>> DescriptionLinesGetter { get; set; }
-                = (pb) => new ColorString[] { pb.IsPaused ? new ColorString("[Paused]", ConsoleColor.DarkCyan) : new ColorString($"{pb.ElementName}", ConsoleColor.DarkYellow) };
+            public TextLineDefinition Value(string value)
+                => Value(pb => value);
 
-            /// <summary>
-            /// Function to Get the Description lines to put under ProgressBar, when it is Done (disposed or finished)
-            /// </summary>
-            public Func<ProgressBar, IEnumerable<ColorString>> DoneDescriptionLinesGetter { get; set; }
-                = (pb) => new ColorString[] { new ColorString($"{pb.Value} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)} ({Utils.ConvertToStringWithAllHours(pb.TimePerElement)} each one)", ConsoleColor.DarkGray) };
+            public TextLineDefinition Value(Func<ProgressBar, string> valueGetter)
+            {
+                ValueGetter = valueGetter;
+                return this;
+            }
 
+            public TextLineDefinition ForegroundColor(ConsoleColor foregroundColor)
+                => ForegroundColor(pb => foregroundColor);
+
+            public TextLineDefinition ForegroundColor(Func<ProgressBar, ConsoleColor> foregroundColorGetter)
+            {
+                ForegroundColorGetter = foregroundColorGetter;
+                return this;
+            }
+
+            public TextLineDefinition BackgroundColor(ConsoleColor backgroundColor)
+                => BackgroundColor(pb => backgroundColor);
+
+            public TextLineDefinition BackgroundColor(Func<ProgressBar, ConsoleColor> backgroundColorGetter)
+            {
+                BackgroundColorGetter = backgroundColorGetter;
+                return this;
+            }
+
+            public TextLineDefinition()
+            {
+                Show(true);
+            }
+
+            public ColorString GetColorString(ProgressBar progressBar)
+            {
+                if (!ShowGetter?.Invoke(progressBar) ?? false)
+                    return null;
+
+                string value = ValueGetter?.Invoke(progressBar);
+                if (string.IsNullOrEmpty(value))
+                    return null;
+
+                return new ColorString(value, ForegroundColorGetter?.Invoke(progressBar), BackgroundColorGetter?.Invoke(progressBar));
+            }
+        }
+
+        public class TextLineDefinitionList
+        {
+            public List<TextLineDefinition> List { get; private set; } = new List<TextLineDefinition>();
+
+            public TextLineDefinitionList Clear()
+            {
+                List.Clear();
+                return this;
+            }
+
+            public TextLineDefinition Add()
+            {
+                var line = new TextLineDefinition();
+                List.Add(line);
+                return line;
+            }
+
+            public List<ColorString> GetColorStringList(ProgressBar progressBar)
+                => List?.Select(l => l.GetColorString(progressBar)).ToList();
+        }
+
+        /// <summary>
+        /// Definition for the Texts in a ProgressBar
+        /// </summary>
+        public class TextDefinition
+        {
+            public TextLineDefinition Processing { get; private set; } = new TextLineDefinition();
+            public TextLineDefinition Paused { get; private set; } = new TextLineDefinition();
+            public TextLineDefinition Done { get; private set; } = new TextLineDefinition();
+
+            public TextDefinition()
+            {
+                Processing.Value(pb =>
+                    pb.HasProgress ?
+                        $"{pb.Value} of {pb.Maximum} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)}, remaining: {Utils.ConvertToStringAsSumarizedRemainingText(pb.TimeRemaining)}"
+                        : $"Processing... ({pb.Value} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)})"
+                        )
+                    .ForegroundColor(ConsoleColor.Cyan);
+
+                Paused.Value(pb =>
+                    pb.HasProgress ?
+                        $"Paused... Running time: {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)}"
+                        : $"{pb.Value} of {pb.Maximum} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)} (paused)"
+                        )
+                    .ForegroundColor(ConsoleColor.DarkCyan);
+
+                Done.Value("Done!")
+                    .ForegroundColor(ConsoleColor.DarkYellow);
+            }
+
+            public ColorString GetColorString(ProgressBar progressBar)
+            {
+                if (progressBar == null)
+                    return null;
+                if (progressBar.IsPaused)
+                    return Paused?.GetColorString(progressBar);
+                if (progressBar.IsDone)
+                    return Done?.GetColorString(progressBar);
+                if (progressBar.IsStarted)
+                    return Processing?.GetColorString(progressBar);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Definition for the Description lines in a ProgressBar
+        /// </summary>
+        public class DescriptionDefinition
+        {
+            public TextLineDefinitionList Processing { get; private set; } = new TextLineDefinitionList();
+            public TextLineDefinitionList Paused { get; private set; } = new TextLineDefinitionList();
+            public TextLineDefinitionList Done { get; private set; } = new TextLineDefinitionList();
+
+            public DescriptionDefinition()
+            {
+                Processing.Add()
+                    .Value(pb => pb.ElementName)
+                    .ForegroundColor(ConsoleColor.DarkYellow);
+
+                Paused.Add()
+                    .Value("[Paused]")
+                    .ForegroundColor(ConsoleColor.DarkCyan);
+
+                Done.Add()
+                    .Value(pb => $"{pb.Value} in {Utils.ConvertToStringWithAllHours(pb.TimeProcessing)} ({Utils.ConvertToStringWithAllHours(pb.TimePerElement)} each one)")
+                    .ForegroundColor(ConsoleColor.DarkGray);
+            }
+
+            public DescriptionDefinition Clear()
+            {
+                Processing.Clear();
+                Paused.Clear();
+                Done.Clear();
+                return this;
+            }
+
+            public List<ColorString> GetColorStringList(ProgressBar progressBar)
+            {
+                if (progressBar == null)
+                    return null;
+                if (progressBar.IsPaused)
+                    return Paused?.GetColorStringList(progressBar);
+                if (progressBar.IsDone)
+                    return Done?.GetColorStringList(progressBar);
+                if (progressBar.IsStarted)
+                    return Processing?.GetColorStringList(progressBar);
+                return null;
+            }
         }
 
         /// <summary>
@@ -302,7 +439,17 @@ namespace ConsoleProgressBar
         /// <summary>
         /// Layout of the ProgressBar
         /// </summary>
-        public LayoutDefinition Layout { get; set; }
+        public LayoutDefinition Layout { get; private set; } = new LayoutDefinition();
+
+        /// <summary>
+        /// Text of the ProgressBar
+        /// </summary>
+        public TextDefinition Text { get; private set; } = new TextDefinition();
+
+        /// <summary>
+        /// Description of the ProgressBar
+        /// </summary>
+        public DescriptionDefinition Description { get; private set; } = new DescriptionDefinition();
 
         /// <summary>
         /// The Maximum value
@@ -449,13 +596,12 @@ namespace ConsoleProgressBar
         /// </summary>
         /// <param name="initialPosition">Initial position of the ProgressBar</param>
         /// <param name="autoStart">True if ProgressBar starts automatically</param>
-        /// <param name="layout">The layout to use in the ProgressBar</param>
-        public ProgressBar(int? initialPosition = null, bool autoStart = true, LayoutDefinition layout = null)
+        public ProgressBar(int? initialPosition = null, bool autoStart = true)
         {
             if (initialPosition.HasValue)
                 _ConsoleRow = initialPosition.Value;
             ProgressStopwatch = new Stopwatch();
-            Layout = layout ?? new LayoutDefinition();
+
             if (autoStart)
                 Start();
         }
@@ -480,6 +626,7 @@ namespace ConsoleProgressBar
                           {
                               try
                               {
+                                  IsStarted = true;
                                   UpdateMarqueePosition();
                                   Print();
                                   Task.Delay(Delay).Wait();
@@ -683,12 +830,7 @@ namespace ConsoleProgressBar
             var maxTextLenght = Console.BufferWidth - Layout.TotalLength;
             if (maxTextLenght >= 10) //Text will be printed if there are 10 chars or more
             {
-                if (IsDone)
-                    coloredText = Layout.DoneTextGetter?.Invoke(this);
-                else if (HasProgress)
-                    coloredText = Layout.ProgressTextGetter?.Invoke(this);
-                else
-                    coloredText = Layout.NoProgressTextGetter?.Invoke(this);
+                coloredText = Text.GetColorString(this);
                 if (!string.IsNullOrEmpty(coloredText?.Value))
                     list.AddRange(coloredText.GetConsoleWriteActions(s => Utils.AdaptTextToMaxWidth(" " + s, maxTextLenght)));
             }
@@ -696,10 +838,10 @@ namespace ConsoleProgressBar
             _NumberLastLinesWritten = 1;
 
             // Description
-            var descriptionLinesGetter = IsDone ? Layout.DoneDescriptionLinesGetter : Layout.DescriptionLinesGetter;
-            if (descriptionLinesGetter != null)
+            var lines = Description.GetColorStringList(this);
+            if (lines != null)
             {
-                foreach (var line in descriptionLinesGetter.Invoke(this))
+                foreach (var line in lines)
                 {
                     if (line != null)
                     {
