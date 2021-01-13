@@ -12,14 +12,12 @@ Code:
 using (var pg = new ProgressBar() { Maximum = 1000 }) //Create the ProgressBar
 {
   for (int i = 0; i < 1000; i++)  //Iterate over elements
-  {
-    //Assign Current element Name
-    pg.CurrentElementName = elementName[i];
-		
+  {	
     Task.Delay(20).Wait();  //Do something
 		
     //PerformStep in ProgressBar
-    pg.PerformStep();
+    // and assign element Name (optional)
+    pg.PerformStep(elementName[i]);
   }
 }
 ```
