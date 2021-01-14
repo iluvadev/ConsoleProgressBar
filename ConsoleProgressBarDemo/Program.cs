@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2020, iluvadev, and released under MIT License.  This can be found in the root of this distribution. 
 
 using ConsoleProgressBar;
+using ConsoleProgressBar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -40,13 +41,19 @@ namespace ConsoleProgressBarDemo
                 {
                     pb.Description.Clear();
                     pb.Description.Done
-                        .Add()
-                        .Value(p => $"Progress Bar 1: {p.Value} done in {ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)}")
-                        .ForegroundColor(ConsoleColor.DarkBlue);
+                        .AddNew()
+                        .SetValue(p => $"Progress Bar 1: {p.Value} done in {p.TimeProcessing.ToStringWithAllHours()}")
+                        .SetForegroundColor(ConsoleColor.DarkBlue);
 
+                    pb.Layout.Margins.SetVisible(false);
+                    pb.Layout.Body.SetValue('─')
+                                  .Pending.SetForegroundColor(ConsoleColor.DarkRed);
+                    pb.Layout.Marquee.SetValue('─');
+                    //pb.Layout.ProgressBarWidth = Console.BufferWidth;
 
                     pb.Layout.InnerLength = Console.BufferWidth;
                     pb.Layout.Start.Value = pb.Layout.End.Value = "";
+                    
                     pb.Layout.Pending.ForegroundColor = ConsoleColor.DarkRed;
                     pb.Layout.Progress.Value =
                     pb.Layout.Pending.Value =
@@ -71,8 +78,8 @@ namespace ConsoleProgressBarDemo
                 using (var pb = new ProgressBar(5) { Maximum = 500 })
                 {
                     pb.Text.Done
-                        .Value(p => $"Progress Bar 2: {p.Value} elements processed in {ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)}")
-                        .ForegroundColor(p => ConsoleColor.Green);
+                        .SetValue(p => $"Progress Bar 2: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
+                        .SetForegroundColor(p => ConsoleColor.Green);
 
                     pb.Description.Clear();
 
@@ -95,6 +102,8 @@ namespace ConsoleProgressBarDemo
                     pb.Layout.Pending.Value =
                     pb.Layout.MarqueeInProgressPending.Value = '─';
 
+                    pb.Layout.Marquee.OverPending.SetValue('─');
+
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(20).Wait();
@@ -116,8 +125,8 @@ namespace ConsoleProgressBarDemo
                     pb.Layout.Pending.ForegroundColor = ConsoleColor.DarkMagenta;
 
                     pb.Description.Clear();
-                    pb.Description.Processing.Add().Value(p => p.Value.ToString()).ForegroundColor(ConsoleColor.Yellow);
-                    pb.Description.Processing.Add().Value(p => ProgressBar.Utils.ConvertToStringWithAllHours(p.TimeProcessing)).ForegroundColor(ConsoleColor.Cyan);
+                    pb.Description.Processing.AddNew().SetValue(p => p.Value.ToString()).SetForegroundColor(ConsoleColor.Yellow);
+                    pb.Description.Processing.AddNew().SetValue(p => p.TimeProcessing.ToStringWithAllHours()).SetForegroundColor(ConsoleColor.Cyan);
 
                     for (int i = 0; i < 500; i++)
                     {
