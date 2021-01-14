@@ -37,31 +37,23 @@ namespace ConsoleProgressBarDemo
             Console.Write("ProgressBar 1:");
             Task taskPb1 = new Task(() =>
             {
-                using (var pb = new ProgressBar(1) { Maximum = 500, ShowMarquee = false })
+                using (var pb = new ProgressBar(1, false) { Maximum = 500 })
                 {
                     pb.Description.Clear();
                     pb.Description.Done
                         .AddNew()
                         .SetValue(p => $"Progress Bar 1: {p.Value} done in {p.TimeProcessing.ToStringWithAllHours()}")
                         .SetForegroundColor(ConsoleColor.DarkBlue);
+                    pb.Description.Indentation.SetValue("  └───> ");
 
+                    pb.Layout.Marquee.SetVisible(false);
                     pb.Layout.Margins.SetVisible(false);
                     pb.Layout.Body.SetValue('─')
                                   .Pending.SetForegroundColor(ConsoleColor.DarkRed);
                     pb.Layout.Marquee.SetValue('─');
-                    //pb.Layout.ProgressBarWidth = Console.BufferWidth;
+                    pb.Layout.ProgressBarWidth = Console.BufferWidth;
 
-                    pb.Layout.InnerLength = Console.BufferWidth;
-                    pb.Layout.Start.Value = pb.Layout.End.Value = "";
-                    
-                    pb.Layout.Pending.ForegroundColor = ConsoleColor.DarkRed;
-                    pb.Layout.Progress.Value =
-                    pb.Layout.Pending.Value =
-                    pb.Layout.MarqueeInProgress.Value =
-                    pb.Layout.MarqueeInProgressPending.Value =
-                    pb.Layout.MarqueeAlone.Value = '─';
-
-                    pb.Layout.DescriptionLinesIndentation.Value = "  └───> ";
+                    pb.Start();
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(10).Wait();
@@ -75,7 +67,7 @@ namespace ConsoleProgressBarDemo
             Console.Write("ProgressBar 2:");
             Task taskPb2 = new Task(() =>
             {
-                using (var pb = new ProgressBar(5) { Maximum = 500 })
+                using (var pb = new ProgressBar(5, false) { Maximum = 500 })
                 {
                     pb.Text.Done
                         .SetValue(p => $"Progress Bar 2: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
@@ -83,6 +75,7 @@ namespace ConsoleProgressBarDemo
 
                     pb.Description.Clear();
 
+                    pb.Start();
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(15).Wait();
@@ -96,14 +89,13 @@ namespace ConsoleProgressBarDemo
             Console.Write("ProgressBar 3:");
             Task taskPb3 = new Task(() =>
             {
-                using (var pb = new ProgressBar(9) { Maximum = 500 })
+                using (var pb = new ProgressBar(9, false) { Maximum = 500 })
                 {
-                    pb.Layout.InnerLength = Console.BufferWidth - 2;
-                    pb.Layout.Pending.Value =
-                    pb.Layout.MarqueeInProgressPending.Value = '─';
-
+                    pb.Layout.ProgressBarWidth = Console.BufferWidth;
+                    pb.Layout.Body.Pending.SetValue('─');
                     pb.Layout.Marquee.OverPending.SetValue('─');
 
+                    pb.Start();
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(20).Wait();
@@ -117,17 +109,36 @@ namespace ConsoleProgressBarDemo
             Console.Write("ProgressBar 4:");
             Task taskPb4 = new Task(() =>
             {
-                using (var pb = new ProgressBar(14) { Maximum = null })
+                using (var pb = new ProgressBar(14, false) { Maximum = null })
                 {
-                    pb.Layout.InnerLength = 15;
-                    pb.Layout.Start.Value = pb.Layout.End.Value = "";
-                    pb.Layout.Pending.Value = pb.Layout.MarqueeAlone.Value;
-                    pb.Layout.Pending.ForegroundColor = ConsoleColor.DarkMagenta;
+                    pb.Layout.ProgressBarWidth = 15;
+                    pb.Layout.Margins.SetVisible(false);
+                    pb.Layout.Body.Pending.SetValue('■').SetForegroundColor(ConsoleColor.Magenta);
+                    //pb.Layout.Body.Pending.SetValue(pb =>
+                    //                       {
+                    //                           if (pb.IsDone) return '■';
+                    //                           var seconds = pb.TimeProcessing.Seconds;
+                    //                           if ((seconds % 4) == 0) return '¨';
+                    //                           if ((seconds % 4) == 1) return '·';
+                    //                           if ((seconds % 4) == 2) return '-';
+                    //                           return '_';
+                    //                       })
+                    //                      .SetForegroundColor(pb =>
+                    //                      {
+                    //                          if (pb.IsDone) return ConsoleColor.Green;
+                    //                          if (pb.Value < 100) return ConsoleColor.Magenta;
+                    //                          if (pb.Value < 200) return ConsoleColor.Cyan;
+                    //                          if (pb.Value < 300) return ConsoleColor.Red;
+                    //                          if (pb.Value < 400) return ConsoleColor.White;
+                    //                          return ConsoleColor.DarkYellow;
+                    //                      });
+                    pb.Layout.Marquee.OverPending.SetValue('■');
 
                     pb.Description.Clear();
                     pb.Description.Processing.AddNew().SetValue(p => p.Value.ToString()).SetForegroundColor(ConsoleColor.Yellow);
                     pb.Description.Processing.AddNew().SetValue(p => p.TimeProcessing.ToStringWithAllHours()).SetForegroundColor(ConsoleColor.Cyan);
 
+                    pb.Start();
                     for (int i = 0; i < 500; i++)
                     {
                         Task.Delay(25).Wait();
