@@ -26,28 +26,37 @@ namespace ConsoleProgressBar
             private Func<ProgressBar, T> _ValueGetter;
             private Func<ProgressBar, ConsoleColor> _ForegroundColorGetter;
             private Func<ProgressBar, ConsoleColor> _BackgroundColorGetter;
+            private Func<ProgressBar, bool> _VisibleGetter;
+
+            public Element<T> SetVisible(bool show)
+                => SetVisible(pb => show);
+            public Element<T> SetVisible(Func<ProgressBar, bool> showGetter)
+            {
+                _VisibleGetter = showGetter;
+                return this;
+            }
+            public bool GetVisible(ProgressBar progressBar)
+                => _VisibleGetter?.Invoke(progressBar) ?? true;
 
             public Element<T> SetValue(T value)
-                => SetValue(pb => value);
-
+                  => SetValue(pb => value);
             public Element<T> SetValue(Func<ProgressBar, T> valueGetter)
             {
                 _ValueGetter = valueGetter;
                 return this;
             }
             public virtual T GetValue(ProgressBar progressBar)
-                => _ValueGetter != null ? _ValueGetter.Invoke(progressBar) : default;
+                => GetVisible(progressBar) && _ValueGetter != null ? _ValueGetter.Invoke(progressBar) : default;
 
             public Element<T> SetForegroundColor(ConsoleColor foregroundColor)
                 => SetForegroundColor(pb => foregroundColor);
-
             public Element<T> SetForegroundColor(Func<ProgressBar, ConsoleColor> foregroundColorGetter)
             {
                 _ForegroundColorGetter = foregroundColorGetter;
                 return this;
             }
             public virtual ConsoleColor? GetForegroundColor(ProgressBar progressBar)
-                => _ForegroundColorGetter?.Invoke(progressBar);
+                => (GetVisible(progressBar) && _ForegroundColorGetter != null) ? _ForegroundColorGetter.Invoke(progressBar) : (ConsoleColor?)null;
 
             public Element<T> SetBackgroundColor(ConsoleColor backgroundColor)
                 => SetBackgroundColor(pb => backgroundColor);
@@ -58,46 +67,22 @@ namespace ConsoleProgressBar
                 return this;
             }
             public virtual ConsoleColor? GetBackgroundColor(ProgressBar progressBar)
-                => _BackgroundColorGetter?.Invoke(progressBar);
+                => (GetVisible(progressBar) && _BackgroundColorGetter != null) ? _BackgroundColorGetter.Invoke(progressBar) : (ConsoleColor?)null;
         }
 
-        public class ElementOcultable<T> : Element<T>
+        public class ElementList<T>
         {
-            private Func<ProgressBar, bool> _VisibleGetter;
+            public List<Element<T>> List { get; } = new List<Element<T>>();
 
-            public ElementOcultable<T> SetVisible(bool show)
-                => SetVisible(pb => show);
-
-            public ElementOcultable<T> SetVisible(Func<ProgressBar, bool> showGetter)
-            {
-                _VisibleGetter = showGetter;
-                return this;
-            }
-            public bool GetVisible(ProgressBar progressBar)
-                => _VisibleGetter?.Invoke(progressBar) ?? true;
-
-            public override T GetValue(ProgressBar progressBar)
-                => GetVisible(progressBar) ? base.GetValue(progressBar) : default;
-            public override ConsoleColor? GetForegroundColor(ProgressBar progressBar)
-                => GetVisible(progressBar) ? base.GetForegroundColor(progressBar) : null;
-            public override ConsoleColor? GetBackgroundColor(ProgressBar progressBar)
-                => GetVisible(progressBar) ? base.GetBackgroundColor(progressBar) : null;
-        }
-
-        public class ElementList<E, T>
-            where E : Element<T>, new()
-        {
-            public List<E> List { get; } = new List<E>();
-
-            public ElementList<E, T> Clear()
+            public ElementList<T> Clear()
             {
                 List.Clear();
                 return this;
             }
 
-            public E AddNew()
+            public Element<T> AddNew()
             {
-                var line = new E();
+                var line = new Element<T>();
                 List.Add(line);
                 return line;
             }
@@ -112,12 +97,12 @@ namespace ConsoleProgressBar
             /// <summary>
             /// Marquee definition when it moves over a 'Pending' step
             /// </summary>
-            public ElementOcultable<char> OverPending { get; } = new ElementOcultable<char>();
+            public Element<char> OverPending { get; } = new Element<char>();
 
             /// <summary>
             /// Marquee definition when it moves over a 'Progress' step
             /// </summary>
-            public ElementOcultable<char> OverProgress { get; } = new ElementOcultable<char>();
+            public Element<char> OverProgress { get; } = new Element<char>();
 
             public LayoutMarqueeDefinition SetValue(char value)
                 => SetValue(pb => value);
@@ -166,8 +151,8 @@ namespace ConsoleProgressBar
 
         public class LayoutMarginDefinition
         {
-            public ElementOcultable<string> Start { get; } = new ElementOcultable<string>();
-            public ElementOcultable<string> End { get; } = new ElementOcultable<string>();
+            public Element<string> Start { get; } = new Element<string>();
+            public Element<string> End { get; } = new Element<string>();
 
             public LayoutMarginDefinition SetValue(string value)
                 => SetValue(pb => value);
@@ -219,6 +204,7 @@ namespace ConsoleProgressBar
         {
             public Element<char> Pending { get; } = new Element<char>();
             public Element<char> Progress { get; } = new Element<char>();
+            public Element<string> Text { get; } = new Element<string>();
 
             public LayoutBodyDefinition SetValue(char value)
                 => SetValue(pb => value);
@@ -251,6 +237,7 @@ namespace ConsoleProgressBar
             {
                 Pending.SetValue('·').SetForegroundColor(ConsoleColor.DarkGray);
                 Progress.SetValue('■').SetForegroundColor(ConsoleColor.DarkGreen);
+                Text.SetVisible(false);
             }
         }
         /// <summary>
@@ -277,6 +264,7 @@ namespace ConsoleProgressBar
             public LayoutMarqueeDefinition Marquee { get; } = new LayoutMarqueeDefinition();
             public LayoutBodyDefinition Body { get; } = new LayoutBodyDefinition();
 
+
             /// <summary>
             /// Width of entire ProgressBar
             /// Default = 30
@@ -288,6 +276,136 @@ namespace ConsoleProgressBar
             /// </summary>
             public int GetInnerWidth(ProgressBar progressBar)
                 => Math.Max(ProgressBarWidth - Margins.GetLength(progressBar), 0);
+
+            public List<Action> GetRenderActions(ProgressBar progressBar)
+            {
+                var list = new List<Action>();
+
+                //  [■■■■■■■■■■■■········] -> Without Marquee
+                //  [■■■■■■■■■■■■····+···] -> Marquee over Pending space
+                //  [■■■■■■■■#■■■········] -> Marquee over Progress space
+                //  [·····+··············] -> Marquee withot progress
+
+                int innerWidth = GetInnerWidth(progressBar);
+                int progressLenght = progressBar.HasProgress ? Convert.ToInt32(progressBar.Percentage / (100f / innerWidth)) : 0;
+                int pendingLenght = innerWidth - progressLenght;
+
+                bool marqueeInProgress = progressBar.HasProgress &&
+                    progressBar.MarqueePosition >= 0 && progressBar.MarqueePosition < progressLenght &&
+                    Marquee.OverProgress.GetVisible(progressBar);
+                bool marqueeInPending = progressBar.MarqueePosition >= progressLenght &&
+                    Marquee.OverPending.GetVisible(progressBar);
+
+                int progressBeforeMarqueeLength = progressLenght;
+                if (marqueeInProgress) progressBeforeMarqueeLength = progressBar.MarqueePosition;
+
+                int progressAfterMarqueeLength = 0;
+                if (marqueeInProgress) progressAfterMarqueeLength = progressLenght - progressBeforeMarqueeLength - 1;
+
+                int pendingBeforeMarqueeLength = pendingLenght;
+                if (marqueeInPending) pendingBeforeMarqueeLength = progressBar.MarqueePosition - progressLenght;
+
+                int pendingAfterMarqueeLength = 0;
+                if (marqueeInPending) pendingAfterMarqueeLength = pendingLenght - pendingBeforeMarqueeLength - 1;
+
+                string innerText = "";
+                if (Body.Text.GetVisible(progressBar))
+                    innerText = (Body.Text.GetValue(progressBar) ?? "").AdaptToMaxWidth(innerWidth);
+
+                string textProgressBeforeMarquee = string.IsNullOrEmpty(innerText) ?
+                                                   new string(Body.Progress.GetValue(progressBar), progressBeforeMarqueeLength)
+                                                   : innerText.Substring(0, progressBeforeMarqueeLength);
+
+                char? charProgressMarquee = null;
+                if (marqueeInProgress) charProgressMarquee = string.IsNullOrEmpty(innerText) ?
+                                                             Marquee.OverProgress.GetValue(progressBar)
+                                                             : innerText[progressBar.MarqueePosition];
+
+                string textProgressAfterMarquee = string.IsNullOrEmpty(innerText) ?
+                                                  new string(Body.Progress.GetValue(progressBar), progressAfterMarqueeLength)
+                                                  : innerText.Substring(progressBar.MarqueePosition + 1, progressAfterMarqueeLength);
+
+                string textPendingBeforeMarquee = string.IsNullOrEmpty(innerText) ?
+                                                  new string(Body.Pending.GetValue(progressBar), pendingBeforeMarqueeLength)
+                                                  : innerText.Substring(progressLenght, pendingBeforeMarqueeLength);
+
+                char? charPendingMarquee = null;
+                if (marqueeInPending) charPendingMarquee = string.IsNullOrEmpty(innerText) ?
+                                                           Marquee.OverPending.GetValue(progressBar)
+                                                           : innerText[progressBar.MarqueePosition];
+
+                string textPendingAfterMarquee = string.IsNullOrEmpty(innerText) ?
+                                                 new string(Body.Pending.GetValue(progressBar), pendingAfterMarqueeLength)
+                                                 : innerText.Substring(progressBar.MarqueePosition + 1, pendingAfterMarqueeLength);
+
+                //Margin: Start
+                list.AddRange(Margins.Start.GetRenderActions(progressBar));
+
+                //Body: Progress before Marquee
+                if (!string.IsNullOrEmpty(textProgressBeforeMarquee))
+                {
+                    var elementProgressBeforeMarquee = new Element<string>();
+                    elementProgressBeforeMarquee.SetForegroundColor(Body.Progress.GetForegroundColor(progressBar) ?? Console.ForegroundColor);
+                    elementProgressBeforeMarquee.SetBackgroundColor(Body.Progress.GetBackgroundColor(progressBar) ?? Console.BackgroundColor);
+                    elementProgressBeforeMarquee.SetValue(textProgressBeforeMarquee);
+                    list.AddRange(elementProgressBeforeMarquee.GetRenderActions(progressBar));
+                }
+
+                //Body: Marquee in progress
+                if (charProgressMarquee.HasValue)
+                {
+                    var elementProgressMarquee = new Element<char>();
+                    elementProgressMarquee.SetForegroundColor(Marquee.OverProgress.GetForegroundColor(progressBar) ?? Console.ForegroundColor);
+                    elementProgressMarquee.SetBackgroundColor(Marquee.OverProgress.GetBackgroundColor(progressBar) ?? Console.BackgroundColor);
+                    elementProgressMarquee.SetValue(charProgressMarquee.Value);
+                    list.AddRange(elementProgressMarquee.GetRenderActions(progressBar));
+                }
+
+                //Body: Progress after Marquee
+                if (!string.IsNullOrEmpty(textProgressAfterMarquee))
+                {
+                    var elementProgressAfterMarquee = new Element<string>();
+                    elementProgressAfterMarquee.SetForegroundColor(Body.Progress.GetForegroundColor(progressBar) ?? Console.ForegroundColor);
+                    elementProgressAfterMarquee.SetBackgroundColor(Body.Progress.GetBackgroundColor(progressBar) ?? Console.BackgroundColor);
+                    elementProgressAfterMarquee.SetValue(textProgressAfterMarquee);
+                    list.AddRange(elementProgressAfterMarquee.GetRenderActions(progressBar));
+                }
+
+                //Body: Pending before Marquee
+                if (!string.IsNullOrEmpty(textPendingBeforeMarquee))
+                {
+                    var elementPendingBeforeMarquee = new Element<string>();
+                    elementPendingBeforeMarquee.SetForegroundColor(Body.Pending.GetForegroundColor(progressBar) ?? Console.ForegroundColor);
+                    elementPendingBeforeMarquee.SetBackgroundColor(Body.Pending.GetBackgroundColor(progressBar) ?? Console.BackgroundColor);
+                    elementPendingBeforeMarquee.SetValue(textPendingBeforeMarquee);
+                    list.AddRange(elementPendingBeforeMarquee.GetRenderActions(progressBar));
+                }
+
+                //Body: Marquee in Pending
+                if (charPendingMarquee.HasValue)
+                {
+                    var elementPendingMarquee = new Element<char>();
+                    elementPendingMarquee.SetForegroundColor(Marquee.OverPending.GetForegroundColor(progressBar) ?? Console.ForegroundColor);
+                    elementPendingMarquee.SetBackgroundColor(Marquee.OverPending.GetBackgroundColor(progressBar) ?? Console.BackgroundColor);
+                    elementPendingMarquee.SetValue(charPendingMarquee.Value);
+                    list.AddRange(elementPendingMarquee.GetRenderActions(progressBar));
+                }
+
+                //Body: Pending after Marquee
+                if (!string.IsNullOrEmpty(textPendingAfterMarquee))
+                {
+                    var elementPendingAfterMarquee = new Element<string>();
+                    elementPendingAfterMarquee.SetForegroundColor(Body.Pending.GetForegroundColor(progressBar) ?? Console.ForegroundColor);
+                    elementPendingAfterMarquee.SetBackgroundColor(Body.Pending.GetBackgroundColor(progressBar) ?? Console.BackgroundColor);
+                    elementPendingAfterMarquee.SetValue(textPendingAfterMarquee);
+                    list.AddRange(elementPendingAfterMarquee.GetRenderActions(progressBar));
+                }
+
+                //Margin: End
+                list.AddRange(Margins.End.GetRenderActions(progressBar));
+
+                return list;
+            }
         }
 
         /// <summary>
@@ -295,9 +413,9 @@ namespace ConsoleProgressBar
         /// </summary>
         public class TextDefinition
         {
-            public ElementOcultable<string> Processing { get; } = new ElementOcultable<string>();
-            public ElementOcultable<string> Paused { get; } = new ElementOcultable<string>();
-            public ElementOcultable<string> Done { get; } = new ElementOcultable<string>();
+            public Element<string> Processing { get; } = new Element<string>();
+            public Element<string> Paused { get; } = new Element<string>();
+            public Element<string> Done { get; } = new Element<string>();
 
             public TextDefinition()
             {
@@ -319,7 +437,7 @@ namespace ConsoleProgressBar
                     .SetForegroundColor(ConsoleColor.DarkYellow);
             }
 
-            public ElementOcultable<string> GetCurrentText(ProgressBar progressBar)
+            public Element<string> GetCurrentText(ProgressBar progressBar)
             {
                 if (progressBar == null)
                     return null;
@@ -338,15 +456,12 @@ namespace ConsoleProgressBar
         /// </summary>
         public class DescriptionDefinition
         {
-            public ElementList<ElementOcultable<string>, string> Processing { get; }
-                = new ElementList<ElementOcultable<string>, string>();
-            public ElementList<ElementOcultable<string>, string> Paused { get; }
-                = new ElementList<ElementOcultable<string>, string>();
-            public ElementList<ElementOcultable<string>, string> Done { get; }
-                = new ElementList<ElementOcultable<string>, string>();
+            public ElementList<string> Processing { get; } = new ElementList<string>();
+            public ElementList<string> Paused { get; } = new ElementList<string>();
+            public ElementList<string> Done { get; } = new ElementList<string>();
 
-            public ElementOcultable<string> Indentation { get; }
-                 = new ElementOcultable<string>();
+            public Element<string> Indentation { get; }
+                 = new Element<string>();
 
             public DescriptionDefinition()
             {
@@ -373,7 +488,7 @@ namespace ConsoleProgressBar
                 return this;
             }
 
-            public ElementList<ElementOcultable<string>, string> GetCurrentDefinitionList(ProgressBar progressBar)
+            public ElementList<string> GetCurrentDefinitionList(ProgressBar progressBar)
             {
                 if (progressBar == null)
                     return null;
@@ -387,20 +502,35 @@ namespace ConsoleProgressBar
             }
         }
 
+        private LayoutDefinition _Layout = null;
         /// <summary>
         /// Layout of the ProgressBar
         /// </summary>
-        public LayoutDefinition Layout { get; private set; } = new LayoutDefinition();
+        public LayoutDefinition Layout
+        {
+            get => _Layout ??= new LayoutDefinition();
+            set => _Layout = value;
+        }
 
+        private TextDefinition _Text = null;
         /// <summary>
         /// Text of the ProgressBar
         /// </summary>
-        public TextDefinition Text { get; private set; } = new TextDefinition();
+        public TextDefinition Text
+        {
+            get => _Text ??= new TextDefinition();
+            set => _Text = value;
+        }
 
+        private DescriptionDefinition _Description = null;
         /// <summary>
         /// Description of the ProgressBar
         /// </summary>
-        public DescriptionDefinition Description { get; private set; } = new DescriptionDefinition();
+        public DescriptionDefinition Description
+        {
+            get => _Description ??= new DescriptionDefinition();
+            set => _Description = value;
+        }
 
         /// <summary>
         /// Tag object
@@ -632,7 +762,7 @@ namespace ConsoleProgressBar
         {
             if (elementName != null) ElementName = elementName;
             if (tag != null) Tag = tag;
-            
+
             Value += Step;
         }
 
@@ -673,7 +803,7 @@ namespace ConsoleProgressBar
         /// </summary>
         public void Print()
         {
-            List<Action> actionsProgressBar = GetConsoleActionsForProgressBarAndText();
+            List<Action> actionsProgressBar = GetRenderActionsForProgressBarAndText();
             string emptyLine = " ".AdaptToConsole();
 
             //Lock Write to console
@@ -782,13 +912,13 @@ namespace ConsoleProgressBar
             }
         }
 
-        private List<Action> GetConsoleActionsForProgressBarAndText()
+        private List<Action> GetRenderActionsForProgressBarAndText()
         {
             int oldLinesWrited = _NumberLastLinesWritten;
             string emptyLine = " ".AdaptToConsole();
 
             // ProgressBar
-            List<Action> list = GetConsoleActionsForProgressBar();
+            List<Action> list = Layout.GetRenderActions(this);
 
             // Text in same line
             var maxTextLenght = Console.BufferWidth - Layout.ProgressBarWidth;
@@ -796,7 +926,7 @@ namespace ConsoleProgressBar
             {
                 var text = Text.GetCurrentText(this);
                 if (text != null)
-                    list.AddRange(text.GetConsoleWriteActions(this, s => (" " + s).AdaptToMaxWidth(maxTextLenght)));
+                    list.AddRange(text.GetRenderActions(this, s => (" " + s).AdaptToMaxWidth(maxTextLenght)));
             }
             list.Add(() => Console.Write(Environment.NewLine));
             _NumberLastLinesWritten = 1;
@@ -810,9 +940,9 @@ namespace ConsoleProgressBar
                 foreach (var description in descriptionList.List.Where(d => d != null))
                 {
                     if (indentationLen > 0)
-                        list.AddRange(Description.Indentation.GetConsoleWriteActions(this));
+                        list.AddRange(Description.Indentation.GetRenderActions(this));
 
-                    list.AddRange(description.GetConsoleWriteActions(this, s => s.AdaptToMaxWidth(maxDescLenght) + Environment.NewLine));
+                    list.AddRange(description.GetRenderActions(this, s => s.AdaptToMaxWidth(maxDescLenght) + Environment.NewLine));
                     _NumberLastLinesWritten++;
                 }
             }
@@ -836,66 +966,6 @@ namespace ConsoleProgressBar
             MarqueePosition += MarqueeIncrement;
         }
 
-        private List<Action> GetConsoleActionsForProgressBar()
-        {
-            var list = new List<Action>();
-
-            //  [■■■■■■■■■■■■········] -> Without Marquee
-            //  [■■■■■■■■■■■■····+···] -> Marquee over Pending space
-            //  [■■■■■■■■#■■■········] -> Marquee over Progress space
-            //  [·····+··············] -> Marquee withot progress
-
-            int innerWidth = Layout.GetInnerWidth(this);
-            int progressLenght = HasProgress ? Convert.ToInt32(Percentage / (100f / innerWidth)) : 0;
-            int pendingLenght = innerWidth - progressLenght;
-
-            bool marqueeInProgress = HasProgress &&
-                MarqueePosition >= 0 && MarqueePosition < progressLenght &&
-                Layout.Marquee.OverProgress.GetVisible(this);
-            bool marqueeInPending = MarqueePosition >= progressLenght &&
-                Layout.Marquee.OverPending.GetVisible(this);
-
-            int progressBeforeMarqueeLength = progressLenght;
-            if (marqueeInProgress) progressBeforeMarqueeLength = MarqueePosition;
-
-            int progressAfterMarqueeLength = 0;
-            if (marqueeInProgress) progressAfterMarqueeLength = progressLenght - progressBeforeMarqueeLength - 1;
-
-            int pendingBeforeMarqueeLength = pendingLenght;
-            if (marqueeInPending) pendingBeforeMarqueeLength = MarqueePosition - progressLenght;
-
-            int pendingAfterMarqueeLength = 0;
-            if (marqueeInPending) pendingAfterMarqueeLength = pendingLenght - pendingBeforeMarqueeLength - 1;
-
-            //Margin: Start
-            list.AddRange(Layout.Margins.Start.GetConsoleWriteActions(this));
-
-            //Body: Progress before Marquee
-            list.AddRange(Layout.Body.Progress.GetConsoleWriteActions(this, progressBeforeMarqueeLength));
-
-            //Body: Marquee in progress
-            if (marqueeInProgress)
-                list.AddRange(Layout.Marquee.OverProgress.GetConsoleWriteActions(this));
-
-            //Body: Progress after Marquee
-            list.AddRange(Layout.Body.Progress.GetConsoleWriteActions(this, progressAfterMarqueeLength));
-
-            //Body: Pending before Marquee
-            list.AddRange(Layout.Body.Pending.GetConsoleWriteActions(this, pendingBeforeMarqueeLength));
-
-            //Body: Marquee in Pending
-            if (marqueeInPending)
-                list.AddRange(Layout.Marquee.OverPending.GetConsoleWriteActions(this));
-
-            //Body: Pending after Marquee
-            list.AddRange(Layout.Body.Pending.GetConsoleWriteActions(this, pendingAfterMarqueeLength));
-
-            //Margin: End
-            list.AddRange(Layout.Margins.End.GetConsoleWriteActions(this));
-
-            return list;
-        }
-
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -916,7 +986,6 @@ namespace ConsoleProgressBar
 }
 namespace ConsoleProgressBar.Extensions
 {
-
     public static class ElementExtensions
     {
         /// <summary>
@@ -927,12 +996,11 @@ namespace ConsoleProgressBar.Extensions
         /// <param name="valueTransformer">Function to Transform the value before write</param>
         /// <param name="repetitions">Number of repetitions</param>
         /// <returns></returns>
-        public static List<Action> GetConsoleWriteActions<E>(this E element, ProgressBar progressBar, Func<string, string> valueTransformer = null)
-            where E : ProgressBar.Element<string>
+        public static List<Action> GetRenderActions(this ProgressBar.Element<string> element, ProgressBar progressBar, Func<string, string> valueTransformer = null)
         {
             var list = new List<Action>();
 
-            if (element is ProgressBar.ElementOcultable<string> ocultable && !ocultable.GetVisible(progressBar))
+            if (progressBar == null || element == null || !element.GetVisible(progressBar))
                 return list;
 
             var foregroundColor = element.GetForegroundColor(progressBar);
@@ -945,19 +1013,16 @@ namespace ConsoleProgressBar.Extensions
             if (valueTransformer != null) value = valueTransformer.Invoke(value);
 
             list.Add(() => Console.Write(value));
+            list.Add(() => Console.ResetColor());
 
             return list;
         }
 
-        public static List<Action> GetConsoleWriteActions<E>(this E element, ProgressBar progressBar, int repetition = 1)
-            where E : ProgressBar.Element<char>
+        public static List<Action> GetRenderActions(this ProgressBar.Element<char> element, ProgressBar progressBar, int repetition = 1)
         {
             var list = new List<Action>();
 
-            if (repetition < 1)
-                return list;
-
-            if (element is ProgressBar.ElementOcultable<char> ocultable && !ocultable.GetVisible(progressBar))
+            if (progressBar == null || repetition < 1 || element == null || !element.GetVisible(progressBar))
                 return list;
 
             var foregroundColor = element.GetForegroundColor(progressBar);
@@ -968,6 +1033,7 @@ namespace ConsoleProgressBar.Extensions
 
             char value = element.GetValue(progressBar);
             list.Add(() => Console.Write(new string(value, repetition)));
+            list.Add(() => Console.ResetColor());
 
             return list;
         }
@@ -1060,7 +1126,8 @@ namespace ConsoleProgressBar.Extensions
             value = value ?? "";
             int len = value.Length;
 
-            if (len == maxWidth) return value;
+            if (maxWidth <= 0) return "";
+            else if (len == maxWidth) return value;
             else if (len < maxWidth) return value.PadRight(maxWidth);
             else return value.Substring(0, maxWidth - append.Length) + append;
         }
