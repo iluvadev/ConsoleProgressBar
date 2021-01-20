@@ -213,7 +213,6 @@
             <param name="element"></param>
             <param name="progressBar"></param>
             <param name="valueTransformer">Function to Transform the value before write</param>
-            <param name="repetitions">Number of repetitions</param>
             <returns></returns>
         </member>
         <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.Nullable{System.TimeSpan})">

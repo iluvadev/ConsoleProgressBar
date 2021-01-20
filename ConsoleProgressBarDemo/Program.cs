@@ -13,7 +13,7 @@ namespace ConsoleProgressBarDemo
         static void Main(string[] args)
         {
 
-
+            Example1();
             //Example2();
             //Example3();
             Example4();
