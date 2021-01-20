@@ -46,4 +46,5 @@ using (var pb = new ProgressBar{ Maximum = max })
 }
 ```
 And produces:
+
 ![Output of Ussage](docs/img/ProgressBarConsole-Example_Usage1.gif)
