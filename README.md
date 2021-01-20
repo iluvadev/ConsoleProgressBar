@@ -9,14 +9,19 @@ If you want to use it in your projects, simply add the file [`ProgressBar.cs`](C
 
 ## Examples in images
 Default ProgressBar:
+
 ![Output of Ussage](docs/img/ProgressBarConsole-Example_Usage1.gif)
 
 Writing on Console:
+
 ![Screencapture ConsoleProgressBar Demo3](docs/img/ProgressBarConsole-Demo3.gif)
+
 ![Screencapture ConsoleProgressBar Demo4](docs/img/ProgressBarConsole-Demo4.gif)
 
 Styling ProgressBar:
+
 ![Screencapture ConsoleProgressBar Demo](docs/img/ProgressBarConsole-Demo.gif)
+
 ![Screencapture ConsoleProgressBar Demo2](docs/img/ProgressBarConsole-Demo2.gif)
 
 
