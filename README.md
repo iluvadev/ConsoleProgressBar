@@ -40,7 +40,7 @@ using (var pb = new ProgressBar{ Maximum = max })
 {
     for (int i = 0; i < max; i++)
     {
-        Task.Delay(50).Wait(); //Do thinks
+        Task.Delay(50).Wait(); //Do something
         pb.PerformStep(); //Step in ProgressBar (Default is 1)
     }
 }
