@@ -191,6 +191,14 @@
             <param name="elementName">The name of the new Element</param>
             <param name="tag"></param>
         </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.PerformStep(System.Int32,System.String,System.Object)">
+            <summary>
+            Advances the current position of the progress bar by the amount of the Step property
+            </summary>
+            <param name="step">Step to perform</param>
+            <param name="elementName">The name of the new Element</param>
+            <param name="tag"></param>
+        </member>
         <member name="M:ConsoleProgressBar.ProgressBar.Print">
             <summary>
             Prints in Console the ProgressBar

@@ -13,10 +13,11 @@ namespace ConsoleProgressBarDemo
         static void Main(string[] args)
         {
 
-            Example1();
+            //Example1();
             //Example2();
             //Example3();
-            Example4();
+            //Example4();
+            Example5();
 
             Console.ReadKey();
             Console.CursorVisible = false;
@@ -486,6 +487,111 @@ namespace ConsoleProgressBarDemo
                     pb.WriteLine($"[Processed at {pb.TimeProcessing.ToStringWithAllHours(true)}] '{elementName}'", false);
                 }
             }
+        }
+
+        private static void Example5()
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+            //Randomize elementNames
+            var elementNames = new List<string>();
+            for (int i = 0; i < 1000; i++)
+            {
+                var randomNum = random.Next(200) + 20;
+                string elementName = "";
+                for (int j = 0; j < randomNum; j++)
+                    elementName += (char)(random.Next(25) + 65);
+                elementNames.Add(elementName);
+            }
+
+            Console.ReadKey();
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            Console.Write("Dynamic layout:");
+            Console.CursorVisible = false;
+            Task taskPb1 = new Task(() =>
+            {
+                using (var pb = new ProgressBar(1, false) { Maximum = 100 })
+                {
+                    
+                    pb.Layout.Marquee.SetVisible(false);
+                    pb.Description.Clear();
+                    pb.Text.SetValue(pb => $"{pb.Percentage} %")
+                           .SetForegroundColor(pb =>
+                           {
+                               if (pb.Percentage < 20) return ConsoleColor.DarkRed;
+                               else if (pb.Percentage < 40) return ConsoleColor.Red;
+                               else if (pb.Percentage < 60) return ConsoleColor.DarkYellow;
+                               else if (pb.Percentage < 80) return ConsoleColor.DarkGreen;
+                               return ConsoleColor.Green;
+                           });
+
+                    pb.Layout.Marquee.SetVisible(false);
+                    pb.Layout.Margins.SetVisible(false);
+                    pb.Layout.Body.SetForegroundColor(pb =>
+                    {
+                        if (pb.Percentage < 20) return ConsoleColor.DarkRed;
+                        else if (pb.Percentage < 40) return ConsoleColor.Red;
+                        else if (pb.Percentage < 60) return ConsoleColor.DarkYellow;
+                        else if (pb.Percentage < 80) return ConsoleColor.DarkGreen;
+                        return ConsoleColor.Green;
+                    }).SetBackgroundColor(ConsoleColor.Black);
+                    pb.Layout.Body.Pending.SetValue('─').SetForegroundColor(ConsoleColor.DarkGray);
+                    pb.Layout.Body.Progress.SetValue('■');
+                    pb.Layout.ProgressBarWidth = Console.BufferWidth / 2;
+
+                    pb.Start();
+                    for (int i = 0; i < 100; i++)
+                    {
+                        Task.Delay(random.Next(100)).Wait();
+                        pb.PerformStep();
+                    }
+                }
+            });
+            taskPb1.Start();
+
+            Console.SetCursorPosition(0, 4);
+            Console.Write("Dynamic descriptions:");
+            Console.CursorVisible = false;
+            Task taskPb2 = new Task(() =>
+            {
+                using (var pb = new ProgressBar(5, false) { Maximum = 500 })
+                {
+                    pb.Text.Done
+                        .SetValue(p => $"Progress Bar 2: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
+                        .SetForegroundColor(p => ConsoleColor.Green);
+
+                    pb.Description.Clear();
+
+                    pb.Start();
+                    for (int i = 0; i < 500; i++)
+                    {
+                        Task.Delay(10).Wait();
+                        if ((i + 1) % 50 == 0)
+                        {
+                            var current = i+1;
+                            var currentProcessing = pb.TimeProcessing;
+                            var currentRemaining = pb.TimeRemaining;
+                            pb.Description.Processing.AddNew().SetValue(pb => $"{current} elements processed in {currentProcessing.ToStringWithAllHours()}, remaining: {currentRemaining.ToStringWithAllHours()}; ({pb.TimeRemaining.ToStringWithAllHours()}) ");
+                            //.SetForegroundColor(pb =>
+                            //{
+                            //    var dif = (pb.Value - current) % 78;
+                            //    if (dif < 10) return ConsoleColor.White;
+                            //    else if (dif < 20) return ConsoleColor.DarkBlue;
+                            //    else if (dif < 30) return ConsoleColor.Yellow;
+                            //    else if (dif < 40) return ConsoleColor.DarkGreen;
+                            //    return ConsoleColor.Magenta;
+                            //});
+                            pb.Description.Done.AddNew().SetValue($"{i + 1} elements processed in {pb.TimeProcessing.TotalSeconds} secs.");
+                        }
+                        pb.PerformStep(elementNames[i % elementNames.Count]);
+                    }
+                }
+            });
+            taskPb2.Start();
+
+           
+
+            Task.WaitAll(taskPb1, taskPb2);
         }
 
         private static void Example_Usage1()

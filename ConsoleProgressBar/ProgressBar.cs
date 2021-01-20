@@ -401,6 +401,40 @@ namespace ConsoleProgressBar
             public Element<string> Paused { get; } = new Element<string>();
             public Element<string> Done { get; } = new Element<string>();
 
+            public TextDefinition SetVisible(bool show) => SetVisible(pb => show);
+            public TextDefinition SetVisible(Func<ProgressBar, bool> showGetter)
+            {
+                Processing.SetVisible(showGetter);
+                Paused.SetVisible(showGetter);
+                Done.SetVisible(showGetter);
+                return this;
+            }
+            public TextDefinition SetValue(string value) => SetValue(pb => value);
+            public TextDefinition SetValue(Func<ProgressBar, string> valueGetter)
+            {
+                Processing.SetValue(valueGetter);
+                Paused.SetValue(valueGetter);
+                Done.SetValue(valueGetter);
+                return this;
+            }
+            public TextDefinition SetForegroundColor(ConsoleColor foregroundColor) => SetForegroundColor(pb => foregroundColor);
+            public TextDefinition SetForegroundColor(Func<ProgressBar, ConsoleColor> foregroundColorGetter)
+            {
+                Processing.SetForegroundColor(foregroundColorGetter);
+                Paused.SetForegroundColor(foregroundColorGetter);
+                Done.SetForegroundColor(foregroundColorGetter);
+                return this;
+            }
+ 
+            public TextDefinition SetBackgroundColor(ConsoleColor backgroundColor) => SetBackgroundColor(pb => backgroundColor);
+
+            public TextDefinition SetBackgroundColor(Func<ProgressBar, ConsoleColor> backgroundColorGetter)
+            {
+                Processing.SetBackgroundColor(backgroundColorGetter);
+                Paused.SetBackgroundColor(backgroundColorGetter);
+                Done.SetBackgroundColor(backgroundColorGetter);
+                return this;
+            }
             public TextDefinition()
             {
                 Processing.SetValue(pb => pb.HasProgress ?

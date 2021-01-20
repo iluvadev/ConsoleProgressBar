@@ -7,6 +7,26 @@ Is **.Net Core** ready (cross-platform), but only tested on Windows.
 
 If you want to use it in your projects, simply add the file [`ProgressBar.cs`](ConsoleProgressBar/ProgressBar.cs)
 
+## Features
+* Simple to use and configure
+* Can show or hide a *Marquee*: a char that moves around the ProgressBar
+* Maximum is optional: If `Maximum` is `null`, no progress will be shown (but you can show Marquee)
+* Automatically calculates `Percentage` and *Estimated Remaining Time* (`TimeRemaining`)
+* Optional `Text` in the same line as ProgressBar 
+* Optional multiple `Descriptions` under ProgressBar
+* Colors in all components: in ProgressBar `Layout`, in `Text` and `Descriptions`
+
+You can define dynamic content or values, with lambda expressions in:
+* Background and Foreground Colors of `Layout`, `Text` and `Descriptions`
+* Content of `Text` and `Descriptions`
+* Characters used in `Layout` to represent ProgressBar
+
+### How it works
+ProgressBar creates an internal Thread. In this thread the component updates its representation in Console every few time.
+This time is configurable, modifying the ``Delay`` property (default: 75ms)
+
+
+
 ## Examples in images
 Default ProgressBar:
 
