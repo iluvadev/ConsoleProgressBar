@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ConsoleProgressBar</name>
+    </assembly>
+    <members>
+        <member name="T:ConsoleProgressBar.ProgressBar">
+            <summary>
+            A ProgressBar for Console
+            </summary>
+        </member>
+        <member name="T:ConsoleProgressBar.ProgressBar.LayoutMarqueeDefinition">
+            <summary>
+            Definition for the Marquee
+            The Marquee is a char that moves around the ProgressBar
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.LayoutMarqueeDefinition.OverPending">
+            <summary>
+            Marquee definition when it moves over a 'Pending' step
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.LayoutMarqueeDefinition.OverProgress">
+            <summary>
+            Marquee definition when it moves over a 'Progress' step
+            </summary>
+        </member>
+        <member name="T:ConsoleProgressBar.ProgressBar.LayoutDefinition">
+            <summary>
+            Definition of a Layout for a ProgressBar representation
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.LayoutDefinition.ProgressBarWidth">
+            <summary>
+            Width of entire ProgressBar
+            Default = 30
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.LayoutDefinition.GetInnerWidth(ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the internal Width of the ProgressBar
+            </summary>
+        </member>
+        <member name="T:ConsoleProgressBar.ProgressBar.TextDefinition">
+            <summary>
+            Definition for the Texts in a ProgressBar
+            </summary>
+        </member>
+        <member name="T:ConsoleProgressBar.ProgressBar.DescriptionDefinition">
+            <summary>
+            Definition for the Description lines in a ProgressBar
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Layout">
+            <summary>
+            Layout of the ProgressBar
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Text">
+            <summary>
+            Text of the ProgressBar
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Description">
+            <summary>
+            Description of the ProgressBar
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Tag">
+            <summary>
+            Tag object
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Maximum">
+            <summary>
+            The Maximum value
+            Default = 100
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Value">
+            <summary>
+            The current Value
+            If Value is greater than Maximum, then updates Maximum value
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Percentage">
+            <summary>
+            Percentage of progress
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.HasProgress">
+            <summary>
+            Indicates if the ProgressBar has Progress defined (Maximum defined)
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Step">
+            <summary>
+            The amount by which to increment the ProgressBar with each call to the PerformStep() method.
+            Default = 1
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.ElementName">
+            <summary>
+            The Name of the Curent Element
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.FixedInBottom">
+            <summary>
+            True to Print the ProgressBar always in last Console Line
+            False to Print the ProgressBar fixed in Console (Current position at Starting)
+            You can Write at Console and ProgressBar will always be below your lines
+            Default = true
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.Delay">
+            <summary>
+            Delay for repaint and recalculate all ProgressBar
+            Default = 75
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.IsStarted">
+            <summary>
+            True if ProgressBar is Started
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.IsPaused">
+            <summary>
+            True if ProgressBar is Paused
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.IsDone">
+            <summary>
+            True if ProgresBar is Done: when disposing or Progress is finished
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.TimeProcessing">
+            <summary>
+            Processing time (time paused excluded)
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.TimePerElement">
+            <summary>
+            Processing time per element (median)
+            </summary>
+        </member>
+        <member name="P:ConsoleProgressBar.ProgressBar.TimeRemaining">
+            <summary>
+            Estimated time finish (to Value = Maximum)
+            </summary>
+        </member>
+        <member name="F:ConsoleProgressBar.ProgressBar.ConsoleWriterLock">
+            <summary>
+            A Lock for Writing to Console
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.#ctor(System.Nullable{System.Int32},System.Boolean)">
+            <summary>
+            Creates an instance of ConsoleProgressBar
+            </summary>
+            <param name="initialPosition">Initial position of the ProgressBar</param>
+            <param name="autoStart">True if ProgressBar starts automatically</param>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.Start">
+            <summary>
+            Starts the ProgressBar
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.Pause">
+            <summary>
+            Pauses the ProgressBar
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.Resume">
+            <summary>
+            Resume the ProgresBar
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.SetValue(System.Int32,System.String,System.Object)">
+            <summary>
+            Assigns the current Value, and optionally current ElementName and Tag
+            If Value is greater than Maximum, updates Maximum as Value
+            </summary>
+            <param name="value"></param>
+            <param name="elementName"></param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.PerformStep(System.String,System.Object)">
+            <summary>
+            Advances the current position of the progress bar by the amount of the Step property
+            </summary>
+            <param name="elementName">The name of the new Element</param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.Print">
+            <summary>
+            Prints in Console the ProgressBar
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.Unprint">
+            <summary>
+            Unprints (remove) from Console last ProgressBar printed
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.ProgressBar.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.ElementExtensions.GetRenderActions(ConsoleProgressBar.ProgressBar.Element{System.String},ConsoleProgressBar.ProgressBar,System.Func{System.String,System.String})">
+            <summary>
+            Returns a list of Actions to write the element in Console
+            </summary>
+            <param name="element"></param>
+            <param name="progressBar"></param>
+            <param name="valueTransformer">Function to Transform the value before write</param>
+            <param name="repetitions">Number of repetitions</param>
+            <returns></returns>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.Nullable{System.TimeSpan})">
+            <summary>
+            Gets a textual Sumarized for remaining time: X days, or Y hours, or Z minutes, etc.
+            </summary>
+            <param name="ts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.TimeSpan)">
+            <summary>
+            Gets a textual Sumarized for remaining time: X days, or Y hours, or Z minutes, etc.
+            </summary>
+            <param name="ts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringWithAllHours(System.Nullable{System.TimeSpan},System.Boolean)">
+            <summary>
+            Converts a TimeSpan to String, showing all hours
+            </summary>
+            <param name="ts"></param>
+            <param name="includeMilliseconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringWithAllHours(System.TimeSpan,System.Boolean)">
+            <summary>
+            Converts a TimeSpan to String, showing all hours
+            </summary>
+            <param name="ts"></param>
+            <param name="includeMilliseconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.StringExtensions.AdaptToConsole(System.String,System.Boolean)">
+            <summary>
+            Returns a string that occupy all console line/s
+            </summary>
+            <param name="value">The string to write in console</param>
+            <param name="allowMultipleLines">To allow print the string in muliple lines or only in one:
+                True: The text can be represented in more than one Console line (fill spaces to the end of last line)
+                False: The text must be represented in only ONE line (truncate to fit or fill spaces to the end of line)
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:ConsoleProgressBar.Extensions.StringExtensions.AdaptToMaxWidth(System.String,System.Int32,System.String)">
+            <summary>
+            Returns a string with exactly maxChars: Truncates string value or fill with spaces to fits exact length
+            </summary>
+            <param name="value"></param>
+            <param name="maxWidth"></param>
+            <param name="append">Text appended when it is truncated. Default: "..."</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

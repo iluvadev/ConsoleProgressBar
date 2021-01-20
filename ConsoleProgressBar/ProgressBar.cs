@@ -654,9 +654,11 @@ namespace ConsoleProgressBar
         {
             get
             {
-                if (!Maximum.HasValue || !TicksPerElement.HasValue) return (long?)null;
+                if (!Maximum.HasValue || !TicksPerElement.HasValue || !TicksCompletedElements.HasValue) return (long?)null;
                 long currentTicks = ProgressStopwatch.ElapsedTicks;
-                long totalTicks = TicksPerElement.Value * Maximum.Value;
+                long currentElementTicks = currentTicks - TicksCompletedElements.Value;
+                long elementTicks = (currentElementTicks <= TicksPerElement.Value) ? TicksPerElement.Value : currentTicks / (Value + 1);
+                long totalTicks = elementTicks * Maximum.Value;
                 return Math.Max(totalTicks - currentTicks, 0);
             }
         }
