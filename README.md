@@ -4,13 +4,13 @@ It needs only a file: ConsoleProgressBar.cs
 
 (Readme under construction)
 Examples:
-![Screencapture ConsoleProgressBar Demo](Images/ProgressBarConsole-Demo.gif)
+![Screencapture ConsoleProgressBar Demo](docs/img/ProgressBarConsole-Demo.gif)
 
 Examples with text in the ProgressBar
-![Screencapture ConsoleProgressBar Demo2](Images/ProgressBarConsole-Demo2.gif)
+![Screencapture ConsoleProgressBar Demo2](docs/img/ProgressBarConsole-Demo2.gif)
 
 
-![Screencapture ConsoleProgressBar with Default Config](Images/ProgressBarConsole-Default.gif)
+![Screencapture ConsoleProgressBar with Default Config](docs/img/ProgressBarConsole-Default.gif)
 Code:
 ```csharp
 using (var pg = new ProgressBar() { Maximum = 1000 }) //Create the ProgressBar
@@ -26,7 +26,7 @@ using (var pg = new ProgressBar() { Maximum = 1000 }) //Create the ProgressBar
 }
 ```
  
- ![Screencapture ConsoleProgressBar with Default Config: writing](Images/ProgressBarConsole-Default-Writing.gif)
+ ![Screencapture ConsoleProgressBar with Default Config: writing](docs/img/ProgressBarConsole-Default-Writing.gif)
 Code:
 ```csharp
 using (var pg = new ProgressBar() { Maximum = 50 }) //Create the ProgressBar
