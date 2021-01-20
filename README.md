@@ -1,52 +1,44 @@
+[***Readme under construction***]
+
 # ConsoleProgressBar
-A ProgressBar for Console, in C# 
-It needs only a file: ConsoleProgressBar.cs
+A versatile and really easy to use ProgressBar for Console applications, written in C#. 
 
-(Readme under construction)
-Examples:
+Is **.Net Core** ready (cross-platform), but only tested on Windows.
+
+If you want to use it in your projects, simply add the file [`ProgressBar.cs`](ConsoleProgressBar\ProgressBar.cs)
+
+## Examples in images
+Default ProgressBar:
+![Output of Ussage](docs/img/ProgressBarConsole-Example_Usage1.gif)
+
+Writing on Console:
+![Screencapture ConsoleProgressBar Demo3](docs/img/ProgressBarConsole-Demo3.gif)
+![Screencapture ConsoleProgressBar Demo4](docs/img/ProgressBarConsole-Demo4.gif)
+
+Styling ProgressBar:
 ![Screencapture ConsoleProgressBar Demo](docs/img/ProgressBarConsole-Demo.gif)
-
-Examples with text in the ProgressBar
 ![Screencapture ConsoleProgressBar Demo2](docs/img/ProgressBarConsole-Demo2.gif)
 
 
-![Screencapture ConsoleProgressBar with Default Config](docs/img/ProgressBarConsole-Default.gif)
-Code:
+## Install
+All the code of the ProjectBar is included in only one file: [`ProgressBar.cs`](ConsoleProgressBar\ProgressBar.cs) 
+
+You can download this file and use it in your own projects. Simple, without dependencies.
+
+## Usage
+You can configure a lot of things, but usage is very simple:
 ```csharp
-using (var pg = new ProgressBar() { Maximum = 1000 }) //Create the ProgressBar
+const int max = 500;
+
+//Create the ProgressBar
+using (var pb = new ProgressBar{ Maximum = max })
 {
-  for (int i = 0; i < 1000; i++)  //Iterate over elements
-  {	
-    Task.Delay(20).Wait();  //Do something
-		
-    //PerformStep in ProgressBar
-    // and assign element Name (optional)
-    pg.PerformStep(elementName[i]);
-  }
-}
-```
- 
- ![Screencapture ConsoleProgressBar with Default Config: writing](docs/img/ProgressBarConsole-Default-Writing.gif)
-Code:
-```csharp
-using (var pg = new ProgressBar() { Maximum = 50 }) //Create the ProgressBar
-{
-  for (int i = 0; i < 50; i++)  //Iterate over elements
-  {
-    //Assign Current element Name
-    pg.CurrentElementName = elementName[i];
-    
-    //Lock Console for Writing
-    lock (ProgressBar.ConsoleWriterLock)
+    for (int i = 0; i < max; i++)
     {
-      //Write over the ProgressBar
-      //Adapt Text to Console width with 'ProgressBar.AdaptTextToMaxWidth'
-      Console.WriteLine(ProgressBar.AdaptTextToMaxWidth($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: {i} - {elementName}", Console.BufferWidth));
-    }	
-    Task.Delay(250).Wait();  //Do something
-		
-    //PerformStep in ProgressBar
-    pg.PerformStep();
-  }
+        Task.Delay(50).Wait(); //Do thinks
+        pb.PerformStep(); //Step in ProgressBar (Default is 1)
+    }
 }
 ```
+And produces:
+![Output of Ussage](docs/img/ProgressBarConsole-Example_Usage1.gif)

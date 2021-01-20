@@ -12,10 +12,18 @@ namespace ConsoleProgressBarDemo
     {
         static void Main(string[] args)
         {
-            Example2();
 
+
+            //Example2();
+            //Example3();
+            Example4();
 
             Console.ReadKey();
+            Console.CursorVisible = false;
+            Example_Usage1();
+            Console.ReadKey();
+
+
             //Console.WriteLine();
             //Console.WriteLine(" ProgressBar with Progress and Marquee (default config)");
             //Console.WriteLine();
@@ -408,6 +416,91 @@ namespace ConsoleProgressBarDemo
             //taskPb4.Start();
 
             Task.WaitAll(taskPb1, taskPb2);
+        }
+
+        private static void Example3()
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+            //Randomize elementNames
+            var elementNames = new List<string>();
+            for (int i = 0; i < 1000; i++)
+            {
+                var randomNum = random.Next(200) + 20;
+                string elementName = "";
+                for (int j = 0; j < randomNum; j++)
+                    elementName += (char)(random.Next(25) + 65);
+                elementNames.Add(elementName);
+            }
+
+            Console.ReadKey();
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            Console.Write("ProgressBar 7:");
+            Console.CursorVisible = false;
+
+            using (var pb = new ProgressBar() { Maximum = 500 })
+            {
+                pb.WriteLine();
+                pb.WriteLine();
+                for (int i = 0; i < 500; i++)
+                {
+                    Task.Delay(10).Wait();
+                    pb.PerformStep(elementNames[i % elementNames.Count]);
+                    if ((i + 1) % 100 == 0)
+                        pb.WriteLine($"We can write... Element {i + 1} processed");
+                }
+            }
+        }
+
+        private static void Example4()
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+            //Randomize elementNames
+            var elementNames = new List<string>();
+            for (int i = 0; i < 1000; i++)
+            {
+                var randomNum = random.Next(200) + 20;
+                string elementName = "";
+                for (int j = 0; j < randomNum; j++)
+                    elementName += (char)(random.Next(25) + 65);
+                elementNames.Add(elementName);
+            }
+
+            Console.ReadKey();
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine("ProgressBar 8:");
+            Console.WriteLine("=============");
+            Console.WriteLine();
+            Console.CursorVisible = false;
+
+            using (var pb = new ProgressBar(autoStart: false) { Maximum = 70 })
+            {
+                pb.FixedInBottom = true;
+                pb.Start();
+                for (int i = 0; i < 70; i++)
+                {
+                    Task.Delay(120).Wait();
+                    string elementName = elementNames[i % elementNames.Count].ToLowerInvariant();
+                    pb.PerformStep(elementName);
+                    pb.WriteLine($"[Processed at {pb.TimeProcessing.ToStringWithAllHours(true)}] '{elementName}'", false);
+                }
+            }
+        }
+
+        private static void Example_Usage1()
+        {
+            const int max = 500;
+
+            //Create the ProgressBar
+            using (var pb = new ProgressBar { Maximum = max })
+            {
+                for (int i = 0; i < max; i++)
+                {
+                    Task.Delay(50).Wait(); //Do thinks
+                    pb.PerformStep(); //Step in ProgressBar
+                }
+            }
         }
     }
 }

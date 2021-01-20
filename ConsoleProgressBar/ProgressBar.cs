@@ -467,6 +467,7 @@ namespace ConsoleProgressBar
             {
                 Processing.AddNew()
                     .SetValue(pb => pb.ElementName)
+                    .SetVisible(pb => !string.IsNullOrEmpty(pb.ElementName))
                     .SetForegroundColor(ConsoleColor.DarkYellow);
 
                 Paused.AddNew()
@@ -768,7 +769,13 @@ namespace ConsoleProgressBar
             Value += Step;
         }
 
-        public void WriteLine(string value, bool truncateToOneLine = true)
+        public void WriteLine()
+            => WriteLine("", null, null, true);
+
+        public void WriteLine(string value)
+            => WriteLine(value, null, null, true);
+
+        public void WriteLine(string value, bool truncateToOneLine)
             => WriteLine(value, null, null, truncateToOneLine);
 
         public void WriteLine(string value, ConsoleColor? foregroundColor = null, ConsoleColor? backgroundColor = null, bool truncateToOneLine = true)
@@ -826,7 +833,7 @@ namespace ConsoleProgressBar
                     if (_ConsoleRow < Console.WindowHeight - _NumberLastLinesWritten)
                     {
                         int newConsoleRow = Console.WindowHeight - _NumberLastLinesWritten;
-                        if (_NumberLastLinesWritten > 0)
+                        if (_NumberLastLinesWritten > 0 && _ConsoleRow >= 0)
                         {
                             //Clear old ProgressBar
                             Console.SetCursorPosition(0, _ConsoleRow);
@@ -939,7 +946,7 @@ namespace ConsoleProgressBar
             {
                 int indentationLen = Description.Indentation.GetValue(this)?.Length ?? 0;
                 var maxDescLenght = Console.BufferWidth - indentationLen;
-                foreach (var description in descriptionList.List.Where(d => d != null))
+                foreach (var description in descriptionList.List.Where(d => d != null && d.GetVisible(this)))
                 {
                     if (indentationLen > 0)
                         list.AddRange(Description.Indentation.GetRenderActions(this));
