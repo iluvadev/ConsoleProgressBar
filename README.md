@@ -26,7 +26,7 @@ Styling ProgressBar:
 
 
 ## Install
-All the code of the ProjectBar is included in only one file: [`ProgressBar.cs`](ConsoleProgressBar/ProgressBar.cs) 
+All the code of the ProgressBar is included in only one file: [`ProgressBar.cs`](ConsoleProgressBar/ProgressBar.cs) 
 
 You can download this file and use it in your own projects. Simple, without dependencies.
 
