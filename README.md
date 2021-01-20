@@ -5,7 +5,7 @@ A versatile and really easy to use ProgressBar for Console applications, written
 
 Is **.Net Core** ready (cross-platform), but only tested on Windows.
 
-If you want to use it in your projects, simply add the file [`ProgressBar.cs`](ConsoleProgressBar\ProgressBar.cs)
+If you want to use it in your projects, simply add the file [`ProgressBar.cs`](ConsoleProgressBar/ProgressBar.cs)
 
 ## Examples in images
 Default ProgressBar:
@@ -21,7 +21,7 @@ Styling ProgressBar:
 
 
 ## Install
-All the code of the ProjectBar is included in only one file: [`ProgressBar.cs`](ConsoleProgressBar\ProgressBar.cs) 
+All the code of the ProjectBar is included in only one file: [`ProgressBar.cs`](ConsoleProgressBar/ProgressBar.cs) 
 
 You can download this file and use it in your own projects. Simple, without dependencies.
 
