@@ -14,10 +14,10 @@ If you want to use it in your projects, simply add the file [`ProgressBar.cs`](C
 * Automatically calculates `Percentage` and *Estimated Remaining Time* (`TimeRemaining`)
 * Optional `Text` in the same line as ProgressBar 
 * Optional multiple `Descriptions` under ProgressBar
-* Colors in all components: in ProgressBar `Layout`, in `Text` and `Descriptions`
+* Colors in all components: in ProgressBar `Layout` elements, in `Text` and `Descriptions`
 
 You can define dynamic content or values, with lambda expressions for:
-* Background and Foreground Colors of `Layout`, `Text` and `Descriptions`
+* Background and Foreground Colors of `Layout` elements, `Text` and `Descriptions`
 * Content of `Text` and `Descriptions`
 * Characters used in `Layout` to represent ProgressBar
 
