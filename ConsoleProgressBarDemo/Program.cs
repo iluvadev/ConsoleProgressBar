@@ -12,8 +12,13 @@ namespace ConsoleProgressBarDemo
     {
         static void Main(string[] args)
         {
+            //DefaultProgressBarDemo.RunDemo();
 
-            //Example1();
+            //Console.ReadKey();
+
+            CustomProcessingTextDemo.RunDemo();
+
+            Example1();
             //Example2();
             //Example3();
             //Example4();
@@ -170,6 +175,7 @@ namespace ConsoleProgressBarDemo
             //Console.WriteLine("All done! Press enter to exit");
             //Console.ReadLine();
         }
+
 
         private static void Example1()
         {
@@ -512,7 +518,7 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(1, false) { Maximum = 100 })
                 {
-                    
+
                     pb.Layout.Marquee.SetVisible(false);
                     pb.Description.Clear();
                     pb.Text.SetValue(pb => $"{pb.Percentage} %")
@@ -568,7 +574,7 @@ namespace ConsoleProgressBarDemo
                         Task.Delay(10).Wait();
                         if ((i + 1) % 50 == 0)
                         {
-                            var current = i+1;
+                            var current = i + 1;
                             var currentProcessing = pb.TimeProcessing;
                             var currentRemaining = pb.TimeRemaining;
                             pb.Description.Processing.AddNew().SetValue(pb => $"{current} elements processed in {currentProcessing.ToStringWithAllHours()}, remaining: {currentRemaining.ToStringWithAllHours()}; ({pb.TimeRemaining.ToStringWithAllHours()}) ");
@@ -589,7 +595,7 @@ namespace ConsoleProgressBarDemo
             });
             taskPb2.Start();
 
-           
+
 
             Task.WaitAll(taskPb1, taskPb2);
         }
