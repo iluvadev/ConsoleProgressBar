@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -9,18 +9,17 @@
     <Copyright>Copyright (c) 2021, iluvadev, and released under MIT License.</Copyright>
     <Description>Simple and versatile ProgressBar for Console Applications, written in C#, .Net Standard 2.1. Progress and/or Marquee, with estimated remaining time, custom layouts, dynamic text, colors and more.</Description>
     <PackageProjectUrl>https://github.com/iluvadev/ConsoleProgressBar</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/iluvadev/ConsoleProgressBar</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>progress-bar;console;library;netstandard</PackageTags>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Dev\iluvadev\projects\ConsoleProgressBar\ConsoleProgressBar\ConsoleProgressBar.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="ProgressBar - còpia.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="https:\github.com\iluvadev\ConsoleProgressBar#readme" />
-  </ItemGroup>
-
 </Project>
