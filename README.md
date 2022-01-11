@@ -1,14 +1,12 @@
 [***Readme under construction***]
 
 # ConsoleProgressBar
-A versatile and really easy to use ProgressBar for Console applications, written in C#. 
+A versatile and easy to use ProgressBar for Console applications, written in C#. 
 
-Is **.Net Core** ready (cross-platform), but only tested on Windows.
-
-If you want to use it in your projects, simply add the file [`ProgressBar.cs`](ConsoleProgressBar/ProgressBar.cs)
+Is **.Net Standard 2.1** (cross-platform ready), but only tested on Windows.
 
 ## Features
-* Simple to use and configure
+* Simple to use with many configuration options
 * Can show or hide a *Marquee*: a char that moves around the ProgressBar
 * Maximum is optional: If `Maximum` is `null`, no progress will be shown (but you can show Marquee)
 * Automatically calculates `Percentage` and *Estimated Remaining Time* (`TimeRemaining`)
