@@ -44,6 +44,9 @@ Styling ProgressBar:
 
 
 ## Install
+[![Nuget](https://img.shields.io/nuget/v/iluvadev.ConsoleProgressBar?style=plastic)](https://www.nuget.org/packages/iluvadev.ConsoleProgressBar/)
+
+Go to [Nuget project page](https://www.nuget.org/packages/iluvadev.ConsoleProgressBar/) to see options
 
 
 ## Usage
