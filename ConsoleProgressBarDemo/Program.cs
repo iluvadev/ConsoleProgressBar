@@ -1,12 +1,19 @@
-﻿// Copyright (c) 2020, iluvadev, and released under MIT License.  This can be found in the root of this distribution. 
+﻿// Description: ProgressBar for Console Applications, with advanced features.
+// Project site: https://github.com/iluvadev/ConsoleProgressBar
+// Issues: https://github.com/iluvadev/ConsoleProgressBar/issues
+// License (MIT): https://github.com/iluvadev/ConsoleProgressBar/blob/main/LICENSE
+//
+// Copyright (c) 2021, iluvadev, and released under MIT License.
+//
 
-using ConsoleProgressBar;
-using ConsoleProgressBar.Extensions;
+
+using iluvadev.ConsoleProgressBar;
+using iluvadev.ConsoleProgressBar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ConsoleProgressBarDemo
+namespace iluvadev.ConsoleProgressBarDemo
 {
     class Program
     {
@@ -200,12 +207,12 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(1, false) { Maximum = 500 })
                 {
-                    pb.Description.Clear();
-                    pb.Description.Done
+                    pb.Text.Description.Clear();
+                    pb.Text.Description.Done
                         .AddNew()
                         .SetValue(p => $"Progress Bar 1: {p.Value} done in {p.TimeProcessing.ToStringWithAllHours()}")
                         .SetForegroundColor(ConsoleColor.DarkBlue);
-                    pb.Description.Indentation.SetValue("  └───> ");
+                    pb.Text.Description.Indentation.SetValue("  └───> ");
 
                     pb.Layout.Marquee.SetVisible(false);
                     pb.Layout.Margins.SetVisible(false);
@@ -230,11 +237,11 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(5, false) { Maximum = 500 })
                 {
-                    pb.Text.Done
+                    pb.Text.Body.Done
                         .SetValue(p => $"Progress Bar 2: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
                         .SetForegroundColor(p => ConsoleColor.Green);
 
-                    pb.Description.Clear();
+                    pb.Text.Description.Clear();
 
                     pb.Start();
                     for (int i = 0; i < 500; i++)
@@ -279,9 +286,9 @@ namespace ConsoleProgressBarDemo
                     pb.Layout.Body.Pending.SetValue('■').SetForegroundColor(ConsoleColor.Magenta);
                     pb.Layout.Marquee.OverPending.SetValue('■');
 
-                    pb.Description.Clear();
-                    pb.Description.Processing.AddNew().SetValue(p => p.Value.ToString()).SetForegroundColor(ConsoleColor.Yellow);
-                    pb.Description.Processing.AddNew().SetValue(p => p.TimeProcessing.ToStringWithAllHours()).SetForegroundColor(ConsoleColor.Cyan);
+                    pb.Text.Description.Clear();
+                    pb.Text.Description.Processing.AddNew().SetValue(p => p.Value.ToString()).SetForegroundColor(ConsoleColor.Yellow);
+                    pb.Text.Description.Processing.AddNew().SetValue(p => p.TimeProcessing.ToStringWithAllHours()).SetForegroundColor(ConsoleColor.Cyan);
 
                     pb.Start();
                     for (int i = 0; i < 500; i++)
@@ -318,7 +325,7 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(1, false) { Maximum = 500 })
                 {
-                    pb.Description.Clear();
+                    pb.Text.Description.Clear();
                     pb.Layout.Marquee.SetVisible(false);
                     pb.Layout.Margins.SetVisible(false);
                     pb.Layout.Body.Pending.SetForegroundColor(ConsoleColor.White).SetBackgroundColor(ConsoleColor.DarkRed);
@@ -350,7 +357,7 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(5, false) { Maximum = 500 })
                 {
-                    pb.Text.Done
+                    pb.Text.Body.Done
                         .SetValue(p => $"Progress Bar 6: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
                         .SetForegroundColor(p => ConsoleColor.Green);
 
@@ -363,7 +370,7 @@ namespace ConsoleProgressBarDemo
                     pb.Layout.Body.Pending.SetForegroundColor(ConsoleColor.DarkRed);
                     pb.Layout.Body.SetBackgroundColor(ConsoleColor.Black);
                     pb.Layout.Marquee.SetBackgroundColor(ConsoleColor.Black);
-                    pb.Description.Clear();
+                    pb.Text.Description.Clear();
 
                     pb.Start();
                     for (int i = 0; i < 500; i++)
@@ -520,8 +527,8 @@ namespace ConsoleProgressBarDemo
                 {
 
                     pb.Layout.Marquee.SetVisible(false);
-                    pb.Description.Clear();
-                    pb.Text.SetValue(pb => $"{pb.Percentage} %")
+                    pb.Text.Description.Clear();
+                    pb.Text.Body.SetValue(pb => $"{pb.Percentage} %")
                            .SetForegroundColor(pb =>
                            {
                                if (pb.Percentage < 20) return ConsoleColor.DarkRed;
@@ -562,11 +569,11 @@ namespace ConsoleProgressBarDemo
             {
                 using (var pb = new ProgressBar(5, false) { Maximum = 500 })
                 {
-                    pb.Text.Done
+                    pb.Text.Body.Done
                         .SetValue(p => $"Progress Bar 2: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
                         .SetForegroundColor(p => ConsoleColor.Green);
 
-                    pb.Description.Clear();
+                    pb.Text.Description.Clear();
 
                     pb.Start();
                     for (int i = 0; i < 500; i++)
@@ -577,7 +584,7 @@ namespace ConsoleProgressBarDemo
                             var current = i + 1;
                             var currentProcessing = pb.TimeProcessing;
                             var currentRemaining = pb.TimeRemaining;
-                            pb.Description.Processing.AddNew().SetValue(pb => $"{current} elements processed in {currentProcessing.ToStringWithAllHours()}, remaining: {currentRemaining.ToStringWithAllHours()}; ({pb.TimeRemaining.ToStringWithAllHours()}) ");
+                            pb.Text.Description.Processing.AddNew().SetValue(pb => $"{current} elements processed in {currentProcessing.ToStringWithAllHours()}, remaining: {currentRemaining.ToStringWithAllHours()}; ({pb.TimeRemaining.ToStringWithAllHours()}) ");
                             //.SetForegroundColor(pb =>
                             //{
                             //    var dif = (pb.Value - current) % 78;
@@ -587,7 +594,7 @@ namespace ConsoleProgressBarDemo
                             //    else if (dif < 40) return ConsoleColor.DarkGreen;
                             //    return ConsoleColor.Magenta;
                             //});
-                            pb.Description.Done.AddNew().SetValue($"{i + 1} elements processed in {pb.TimeProcessing.TotalSeconds} secs.");
+                            pb.Text.Description.Done.AddNew().SetValue($"{i + 1} elements processed in {pb.TimeProcessing.TotalSeconds} secs.");
                         }
                         pb.PerformStep(elementNames[i % elementNames.Count]);
                     }

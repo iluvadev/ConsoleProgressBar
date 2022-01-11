@@ -1,220 +1,141 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>ConsoleProgressBar</name>
+        <name>iluvadev.ConsoleProgressBar</name>
     </assembly>
     <members>
-        <member name="T:ConsoleProgressBar.ProgressBar">
+        <member name="T:iluvadev.ConsoleProgressBar.Element`1">
             <summary>
-            A ProgressBar for Console
+            An element of a ProgressBar
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.#ctor">
+            <summary>
+            Ctor
             </summary>
         </member>
-        <member name="T:ConsoleProgressBar.ProgressBar.LayoutMarqueeDefinition">
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.#ctor(`0,System.ConsoleColor,System.ConsoleColor)">
             <summary>
-            Definition for the Marquee
-            The Marquee is a char that moves around the ProgressBar
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.LayoutMarqueeDefinition.OverPending">
-            <summary>
-            Marquee definition when it moves over a 'Pending' step
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.LayoutMarqueeDefinition.OverProgress">
-            <summary>
-            Marquee definition when it moves over a 'Progress' step
-            </summary>
-        </member>
-        <member name="T:ConsoleProgressBar.ProgressBar.LayoutDefinition">
-            <summary>
-            Definition of a Layout for a ProgressBar representation
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.LayoutDefinition.ProgressBarWidth">
-            <summary>
-            Width of entire ProgressBar
-            Default = 30
-            </summary>
-        </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.LayoutDefinition.GetInnerWidth(ConsoleProgressBar.ProgressBar)">
-            <summary>
-            Gets the internal Width of the ProgressBar
-            </summary>
-        </member>
-        <member name="T:ConsoleProgressBar.ProgressBar.TextDefinition">
-            <summary>
-            Definition for the Texts in a ProgressBar
-            </summary>
-        </member>
-        <member name="T:ConsoleProgressBar.ProgressBar.DescriptionDefinition">
-            <summary>
-            Definition for the Description lines in a ProgressBar
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Layout">
-            <summary>
-            Layout of the ProgressBar
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Text">
-            <summary>
-            Text of the ProgressBar
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Description">
-            <summary>
-            Description of the ProgressBar
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Tag">
-            <summary>
-            Tag object
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Maximum">
-            <summary>
-            The Maximum value
-            Default = 100
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Value">
-            <summary>
-            The current Value
-            If Value is greater than Maximum, then updates Maximum value
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Percentage">
-            <summary>
-            Percentage of progress
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.HasProgress">
-            <summary>
-            Indicates if the ProgressBar has Progress defined (Maximum defined)
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Step">
-            <summary>
-            The amount by which to increment the ProgressBar with each call to the PerformStep() method.
-            Default = 1
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.ElementName">
-            <summary>
-            The Name of the Curent Element
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.FixedInBottom">
-            <summary>
-            True to Print the ProgressBar always in last Console Line
-            False to Print the ProgressBar fixed in Console (Current position at Starting)
-            You can Write at Console and ProgressBar will always be below your lines
-            Default = true
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.Delay">
-            <summary>
-            Delay for repaint and recalculate all ProgressBar
-            Default = 75
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.IsStarted">
-            <summary>
-            True if ProgressBar is Started
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.IsPaused">
-            <summary>
-            True if ProgressBar is Paused
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.IsDone">
-            <summary>
-            True if ProgresBar is Done: when disposing or Progress is finished
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.TimeProcessing">
-            <summary>
-            Processing time (time paused excluded)
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.TimePerElement">
-            <summary>
-            Processing time per element (median)
-            </summary>
-        </member>
-        <member name="P:ConsoleProgressBar.ProgressBar.TimeRemaining">
-            <summary>
-            Estimated time finish (to Value = Maximum)
-            </summary>
-        </member>
-        <member name="F:ConsoleProgressBar.ProgressBar.ConsoleWriterLock">
-            <summary>
-            A Lock for Writing to Console
-            </summary>
-        </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.#ctor(System.Nullable{System.Int32},System.Boolean)">
-            <summary>
-            Creates an instance of ConsoleProgressBar
-            </summary>
-            <param name="initialPosition">Initial position of the ProgressBar</param>
-            <param name="autoStart">True if ProgressBar starts automatically</param>
-        </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.Start">
-            <summary>
-            Starts the ProgressBar
-            </summary>
-        </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.Pause">
-            <summary>
-            Pauses the ProgressBar
-            </summary>
-        </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.Resume">
-            <summary>
-            Resume the ProgresBar
-            </summary>
-        </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.SetValue(System.Int32,System.String,System.Object)">
-            <summary>
-            Assigns the current Value, and optionally current ElementName and Tag
-            If Value is greater than Maximum, updates Maximum as Value
+            Ctor
             </summary>
             <param name="value"></param>
-            <param name="elementName"></param>
-            <param name="tag"></param>
+            <param name="foregroundColor"></param>
+            <param name="backgroundColor"></param>
         </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.PerformStep(System.String,System.Object)">
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetVisible(System.Boolean)">
             <summary>
-            Advances the current position of the progress bar by the amount of the Step property
+            Sets the ProgressBar element visible (or not)
             </summary>
-            <param name="elementName">The name of the new Element</param>
-            <param name="tag"></param>
+            <param name="show"></param>
+            <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.PerformStep(System.Int32,System.String,System.Object)">
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetVisible(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.Boolean})">
             <summary>
-            Advances the current position of the progress bar by the amount of the Step property
+            Sets the ProgressBar element visible (or not)
             </summary>
-            <param name="step">Step to perform</param>
-            <param name="elementName">The name of the new Element</param>
-            <param name="tag"></param>
+            <param name="showGetter"></param>
+            <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.Print">
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.GetVisible(iluvadev.ConsoleProgressBar.ProgressBar)">
             <summary>
-            Prints in Console the ProgressBar
+            Gets the ProgressBar element visibility
             </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.Unprint">
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetValue(`0)">
             <summary>
-            Unprints (remove) from Console last ProgressBar printed
+            Sets the Value of the ProgressBar element
             </summary>
+            <param name="value"></param>
+            <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.ProgressBar.Dispose">
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetValue(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,`0})">
             <summary>
-            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            Sets the Value of the ProgressBar element
+            </summary>
+            <param name="valueGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.GetValue(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the Value of the ProgressBar element
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetForegroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the ForegroundColor of the ProgressBar element
+            </summary>
+            <param name="foregroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetForegroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the ForegroundColor of the ProgressBar element
+            </summary>
+            <param name="foregroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.GetForegroundColor(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the ForegroundColor of the ProgressBar element
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetBackgroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the BackgroundColor of the ProgressBar element
+            </summary>
+            <param name="backgroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.SetBackgroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the BackgroundColor of the ProgressBar element
+            </summary>
+            <param name="backgroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Element`1.GetBackgroundColor(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the BackgroundColor of the ProgressBar element
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.ElementList`1">
+            <summary>
+            A list of Elements of a ProgressBar
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ElementList`1.List">
+            <summary>
+            The List of Elements of a Progressbar
             </summary>
         </member>
-        <member name="M:ConsoleProgressBar.Extensions.ElementExtensions.GetRenderActions(ConsoleProgressBar.ProgressBar.Element{System.String},ConsoleProgressBar.ProgressBar,System.Func{System.String,System.String})">
+        <member name="M:iluvadev.ConsoleProgressBar.ElementList`1.Clear">
+            <summary>
+            Clears the List of elements of a ProgressBar
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ElementList`1.AddNew">
+            <summary>
+            Adds new Element to the List
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Extensions.ElementExtensions">
+            <summary>
+            Extensions for Element
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.ElementExtensions.GetRenderActions(iluvadev.ConsoleProgressBar.Element{System.String},iluvadev.ConsoleProgressBar.ProgressBar,System.Func{System.String,System.String})">
             <summary>
             Returns a list of Actions to write the element in Console
             </summary>
@@ -223,37 +144,21 @@
             <param name="valueTransformer">Function to Transform the value before write</param>
             <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.Nullable{System.TimeSpan})">
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.ElementExtensions.GetRenderActions(iluvadev.ConsoleProgressBar.Element{System.Char},iluvadev.ConsoleProgressBar.ProgressBar,System.Int32)">
             <summary>
-            Gets a textual Sumarized for remaining time: X days, or Y hours, or Z minutes, etc.
+            Returns a list of Actions to write the element in Console
             </summary>
-            <param name="ts"></param>
+            <param name="element"></param>
+            <param name="progressBar"></param>
+            <param name="repetition"></param>
             <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.TimeSpan)">
+        <member name="T:iluvadev.ConsoleProgressBar.Extensions.StringExtensions">
             <summary>
-            Gets a textual Sumarized for remaining time: X days, or Y hours, or Z minutes, etc.
+            Extensions for String
             </summary>
-            <param name="ts"></param>
-            <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringWithAllHours(System.Nullable{System.TimeSpan},System.Boolean)">
-            <summary>
-            Converts a TimeSpan to String, showing all hours
-            </summary>
-            <param name="ts"></param>
-            <param name="includeMilliseconds"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringWithAllHours(System.TimeSpan,System.Boolean)">
-            <summary>
-            Converts a TimeSpan to String, showing all hours
-            </summary>
-            <param name="ts"></param>
-            <param name="includeMilliseconds"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ConsoleProgressBar.Extensions.StringExtensions.AdaptToConsole(System.String,System.Boolean)">
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.StringExtensions.AdaptToConsole(System.String,System.Boolean)">
             <summary>
             Returns a string that occupy all console line/s
             </summary>
@@ -264,7 +169,7 @@
             </param>
             <returns></returns>
         </member>
-        <member name="M:ConsoleProgressBar.Extensions.StringExtensions.AdaptToMaxWidth(System.String,System.Int32,System.String)">
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.StringExtensions.AdaptToMaxWidth(System.String,System.Int32,System.String)">
             <summary>
             Returns a string with exactly maxChars: Truncates string value or fill with spaces to fits exact length
             </summary>
@@ -272,6 +177,642 @@
             <param name="maxWidth"></param>
             <param name="append">Text appended when it is truncated. Default: "..."</param>
             <returns></returns>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Extensions.TimeSpanExtensions">
+            <summary>
+            TimeSpan extensions
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.Nullable{System.TimeSpan})">
+            <summary>
+            Gets a textual Sumarized for remaining time: X days, or Y hours, or Z minutes, etc.
+            </summary>
+            <param name="ts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringAsSumarizedRemainingText(System.TimeSpan)">
+            <summary>
+            Gets a textual Sumarized for remaining time: X days, or Y hours, or Z minutes, etc.
+            </summary>
+            <param name="ts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringWithAllHours(System.Nullable{System.TimeSpan},System.Boolean)">
+            <summary>
+            Converts a TimeSpan to String, showing all hours
+            </summary>
+            <param name="ts"></param>
+            <param name="includeMilliseconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Extensions.TimeSpanExtensions.ToStringWithAllHours(System.TimeSpan,System.Boolean)">
+            <summary>
+            Converts a TimeSpan to String, showing all hours
+            </summary>
+            <param name="ts"></param>
+            <param name="includeMilliseconds"></param>
+            <returns></returns>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Layout">
+            <summary>
+            Definition of a Layout for a ProgressBar representation
+            </summary>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Layout.LayoutBody">
+            <summary>
+            Definition of the Layout used to Render the Body of the ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutBody.Pending">
+            <summary>
+            Element To show in Pending Section
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutBody.Progress">
+            <summary>
+            Element to show in Progress Section
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutBody.Text">
+            <summary>
+            Layout for the Text 
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.SetValue(System.Char)">
+            <summary>
+            Sets the LayoutBody value for Pending and Progress elements
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.SetValue(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.Char})">
+            <summary>
+            Sets the LayoutBody value for Pending and Progress elements
+            </summary>
+            <param name="valueGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.SetForegroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the ForegroundColor for Pending and Progress elements
+            </summary>
+            <param name="foregroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.SetForegroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the ForegroundColor for Pending and Progress elements
+            </summary>
+            <param name="foregroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.SetBackgroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the BackgroundColor for Pending and Progress elements
+            </summary>
+            <param name="backgroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.SetBackgroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the BackgroundColor for Pending and Progress elements
+            </summary>
+            <param name="backgroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutBody.#ctor">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Layout.LayoutMargin">
+            <summary>
+            Definition of the Layout used to Render the Margins of the ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.Start">
+            <summary>
+            Element to show at the Margin Left (Start of the ProgressBar) 
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.End">
+            <summary>
+            Element to show at the Margin Right (End of the ProgressBar)
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetValue(System.String)">
+            <summary>
+            Sets the LayoutMargin value for Start and End elements
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetValue(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.String})">
+            <summary>
+            Sets the LayoutMargin value for Start and End elements
+            </summary>
+            <param name="valueGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetForegroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the ForegroundColor for Start and End elements
+            </summary>
+            <param name="foregroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetForegroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the ForegroundColor for Start and End elements
+            </summary>
+            <param name="foregroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetBackgroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the BackgroundColor for Start and End elements
+            </summary>
+            <param name="backgroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetBackgroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the BackgroundColor for Start and End elements
+            </summary>
+            <param name="backgroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetVisible(System.Boolean)">
+            <summary>
+            Sets the visibility for Start and End elements
+            </summary>
+            <param name="visible"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.SetVisible(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.Boolean})">
+            <summary>
+            Sets the visibility for Start and End elements
+            </summary>
+            <param name="showGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.GetLength(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Return the length of Margins
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMargin.#ctor">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee">
+            <summary>
+            Definition for the Marquee
+            The Marquee is a char that moves around the ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.OverPending">
+            <summary>
+            Marquee definition when it moves over 'Pending' section
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.OverProgress">
+            <summary>
+            Marquee definition when it moves over 'Progress' section
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetValue(System.Char)">
+            <summary>
+            Sets the Marqee definition when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetValue(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.Char})">
+            <summary>
+            Sets the Marqee definition when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="valueGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetForegroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the Marqee Foreground Color when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="foregroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetForegroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the Marqee Foreground Color when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="foregroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetBackgroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the Marqee Background Color when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="backgroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetBackgroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the Marqee Background Color when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="backgroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetVisible(System.Boolean)">
+            <summary>
+            Sets the Marqee Visibility when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="visible"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.SetVisible(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.Boolean})">
+            <summary>
+            Sets the Marqee Visibility when it moves over 'Pending' or 'Progress' section
+            </summary>
+            <param name="showGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.LayoutMarquee.#ctor">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.Margins">
+            <summary>
+            Layout definition for Margins
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.Marquee">
+            <summary>
+            Layout definition for Marquee (character moving around the ProgressBar)
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.Body">
+            <summary>
+            Layout definition for Body
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Layout.ProgressBarWidth">
+            <summary>
+            Width of entire ProgressBar
+            Default = 30
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.GetInnerWidth(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the internal Width of the ProgressBar
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Layout.GetRenderActions(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Returns the Actions to do in order to Render the ProgressBar with this Layout
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.ProgressBar">
+            <summary>
+            A ProgressBar for Console
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Layout">
+            <summary>
+            Layout of the ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Text">
+            <summary>
+            Text definitions for the ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Tag">
+            <summary>
+            Tag object
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Maximum">
+            <summary>
+            The Maximum value
+            Default = 100
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Value">
+            <summary>
+            The current Value
+            If Value is greater than Maximum, then updates Maximum value
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Percentage">
+            <summary>
+            Percentage of progress
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.HasProgress">
+            <summary>
+            Indicates if the ProgressBar has Progress defined (Maximum defined)
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Step">
+            <summary>
+            The amount by which to increment the ProgressBar with each call to the PerformStep() method.
+            Default = 1
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.ElementName">
+            <summary>
+            The Name of the Curent Element
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.FixedInBottom">
+            <summary>
+            True to Print the ProgressBar always in last Console Line
+            False to Print the ProgressBar fixed in Console (Current position at Starting)
+            You can Write at Console and ProgressBar will always be below your lines
+            Default = true
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.Delay">
+            <summary>
+            Delay for repaint and recalculate all ProgressBar
+            Default = 75
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.IsStarted">
+            <summary>
+            True if ProgressBar is Started
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.IsPaused">
+            <summary>
+            True if ProgressBar is Paused
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.IsDone">
+            <summary>
+            True if ProgresBar is Done: when disposing or Progress is finished
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.TimeProcessing">
+            <summary>
+            Processing time (time paused excluded)
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.TimePerElement">
+            <summary>
+            Processing time per element (median)
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.ProgressBar.TimeRemaining">
+            <summary>
+            Estimated time finish (to Value = Maximum)
+            </summary>
+        </member>
+        <member name="F:iluvadev.ConsoleProgressBar.ProgressBar.ConsoleWriterLock">
+            <summary>
+            A Lock for Writing to Console
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.#ctor(System.Nullable{System.Int32},System.Boolean)">
+            <summary>
+            Creates an instance of ConsoleProgressBar
+            </summary>
+            <param name="initialPosition">Initial position of the ProgressBar</param>
+            <param name="autoStart">True if ProgressBar starts automatically</param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.Start">
+            <summary>
+            Starts the ProgressBar
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.Pause">
+            <summary>
+            Pauses the ProgressBar
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.Resume">
+            <summary>
+            Resume the ProgresBar
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.SetValue(System.Int32,System.String,System.Object)">
+            <summary>
+            Assigns the current Value, and optionally current ElementName and Tag
+            If Value is greater than Maximum, updates Maximum as Value
+            </summary>
+            <param name="value"></param>
+            <param name="elementName"></param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.PerformStep(System.String,System.Object)">
+            <summary>
+            Advances the current position of the progress bar by the amount of the Step property
+            </summary>
+            <param name="elementName">The name of the new Element</param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.PerformStep(System.Int32,System.String,System.Object)">
+            <summary>
+            Advances the current position of the progress bar by the amount of the Step property
+            </summary>
+            <param name="step">Step to perform</param>
+            <param name="elementName">The name of the new Element</param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.WriteLine">
+            <summary>
+            WriteLine in Console when ProgressBar is running
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.WriteLine(System.String)">
+            <summary>
+            WriteLine in Console when ProgressBar is running
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.WriteLine(System.String,System.Boolean)">
+            <summary>
+            WriteLine in Console when ProgressBar is running
+            </summary>
+            <param name="value"></param>
+            <param name="truncateToOneLine"></param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.WriteLine(System.String,System.Nullable{System.ConsoleColor},System.Nullable{System.ConsoleColor},System.Boolean)">
+            <summary>
+            WriteLine in Console when ProgressBar is running
+            </summary>
+            <param name="value"></param>
+            <param name="foregroundColor"></param>
+            <param name="backgroundColor"></param>
+            <param name="truncateToOneLine"></param>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.Render">
+            <summary>
+            Renders in Console the ProgressBar
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.Unrender">
+            <summary>
+            Unrenders (remove) from Console last ProgressBar printed
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.ProgressBar.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Text">
+            <summary>
+            Definitions for Texts in a ProgressBar
+            </summary>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Text.TextBody">
+            <summary>
+            Definition for the Texts in a ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextBody.Processing">
+            <summary>
+            Text in Body definition when ProgressBar is "Processing"
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextBody.Paused">
+            <summary>
+            Text in Body definition when ProgressBar is "Paused"
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextBody.Done">
+            <summary>
+            Text in Body definition when ProgressBar is "Done"
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetVisible(System.Boolean)">
+            <summary>
+            Sets the Body Text visibility
+            </summary>
+            <param name="show"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetVisible(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.Boolean})">
+            <summary>
+            Sets the Body Text visibility
+            </summary>
+            <param name="showGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetValue(System.String)">
+            <summary>
+            Sets the Body Text definition in all ProgressBar states ("Processing", "Paused", "Done")
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetValue(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.String})">
+            <summary>
+            Sets the Body Text definition in all ProgressBar states ("Processing", "Paused", "Done")
+            </summary>
+            <param name="valueGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetForegroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the Body Text Foreground Color
+            </summary>
+            <param name="foregroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetForegroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the Body Text Foreground Color
+            </summary>
+            <param name="foregroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetBackgroundColor(System.ConsoleColor)">
+            <summary>
+            Sets the Body Text Background Color
+            </summary>
+            <param name="backgroundColor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.SetBackgroundColor(System.Func{iluvadev.ConsoleProgressBar.ProgressBar,System.ConsoleColor})">
+            <summary>
+            Sets the Body Text Background Color
+            </summary>
+            <param name="backgroundColorGetter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.#ctor">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextBody.GetCurrentText(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the current Text Body definition by the ProgressBar context ("Processing", "Paused" or "Done")
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="T:iluvadev.ConsoleProgressBar.Text.TextDescription">
+            <summary>
+            Definition for the Description lines in a ProgressBar
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextDescription.Processing">
+            <summary>
+            Description lines definition when ProgressBar is "Processing"
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextDescription.Paused">
+            <summary>
+            Description lines definition when ProgressBar is "Paused"
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextDescription.Done">
+            <summary>
+            Description lines definition when ProgressBar is "Done"
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.TextDescription.Indentation">
+            <summary>
+            Indentation for Description lines
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextDescription.#ctor">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextDescription.Clear">
+            <summary>
+            Clears Description Lines
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iluvadev.ConsoleProgressBar.Text.TextDescription.GetCurrentDefinitionList(iluvadev.ConsoleProgressBar.ProgressBar)">
+            <summary>
+            Gets the current Description Lines definition by the ProgressBar context ("Processing", "Paused" or "Done")
+            </summary>
+            <param name="progressBar"></param>
+            <returns></returns>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.Body">
+            <summary>
+            Definition of the text in the same line as ProgressBar (Body)
+            </summary>
+        </member>
+        <member name="P:iluvadev.ConsoleProgressBar.Text.Description">
+            <summary>
+            Definition of the texts in the lines below a ProgressBar (Description)
+            </summary>
         </member>
     </members>
 </doc>

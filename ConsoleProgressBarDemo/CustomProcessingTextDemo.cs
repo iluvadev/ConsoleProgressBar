@@ -1,8 +1,16 @@
-﻿using ConsoleProgressBar;
+﻿// Description: ProgressBar for Console Applications, with advanced features.
+// Project site: https://github.com/iluvadev/ConsoleProgressBar
+// Issues: https://github.com/iluvadev/ConsoleProgressBar/issues
+// License (MIT): https://github.com/iluvadev/ConsoleProgressBar/blob/main/LICENSE
+//
+// Copyright (c) 2021, iluvadev, and released under MIT License.
+//
+
+using iluvadev.ConsoleProgressBar;
 using System;
 using System.Threading.Tasks;
 
-namespace ConsoleProgressBarDemo
+namespace iluvadev.ConsoleProgressBarDemo
 {
     public static class CustomProcessingTextDemo
     {
@@ -42,7 +50,7 @@ namespace ConsoleProgressBarDemo
             //Create the ProgressBar (initialLine is optional, last Console line is assumed)
             using (var pb = new ProgressBar(initialLine + 1) { Maximum = max })
             {
-                pb.Text.Processing.SetVisible(false); //Set always Visible = false
+                pb.Text.Body.Processing.SetVisible(false); //Set always Visible = false
                 for (int i = 0; i < max; i++)
                 {
                     Task.Delay(25).Wait(); //Do something
@@ -69,7 +77,7 @@ namespace ConsoleProgressBarDemo
             //Create the ProgressBar (initialLine is optional, last Console line is assumed)
             using (var pb = new ProgressBar(initialLine + 1) { Maximum = null })
             {
-                pb.Text.Processing.SetValue("Processing, please wait..."); //Set fixed Processing text
+                pb.Text.Body.Processing.SetValue("Processing, please wait..."); //Set fixed Processing text
                 for (int i = 0; i < max; i++)
                 {
                     Task.Delay(25).Wait(); //Do something
@@ -94,7 +102,7 @@ namespace ConsoleProgressBarDemo
             //Create the ProgressBar (initialLine is optional, last Console line is assumed)
             using (var pb = new ProgressBar(initialLine + 1) { Maximum = max })
             {
-                pb.Text.Processing.SetValue(b => $"Processing petition {b.Value}... (runing time: {b.TimeProcessing})"); //Set contextual Processing text
+                pb.Text.Body.Processing.SetValue(b => $"Processing petition {b.Value}... (runing time: {b.TimeProcessing})"); //Set contextual Processing text
                 for (int i = 0; i < max; i++)
                 {
                     Task.Delay(25).Wait(); //Do something

@@ -1,8 +1,16 @@
-﻿using ConsoleProgressBar;
+﻿// Description: ProgressBar for Console Applications, with advanced features.
+// Project site: https://github.com/iluvadev/ConsoleProgressBar
+// Issues: https://github.com/iluvadev/ConsoleProgressBar/issues
+// License (MIT): https://github.com/iluvadev/ConsoleProgressBar/blob/main/LICENSE
+//
+// Copyright (c) 2021, iluvadev, and released under MIT License.
+//
+
+using iluvadev.ConsoleProgressBar;
 using System;
 using System.Threading.Tasks;
 
-namespace ConsoleProgressBarDemo
+namespace iluvadev.ConsoleProgressBarDemo
 {
     public static class DefaultProgressBarDemo
     {
