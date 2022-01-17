@@ -45,7 +45,7 @@ using (var pb = new ProgressBar { Maximum = max })
 ```
 ### With params:
 
-![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example02.gif)
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example02.gif)
 #### Code:
 ```csharp
 const int max = 1000;
@@ -66,7 +66,7 @@ using (var pb = new ProgressBar(initialPosition: 3, autoStart: false) { Maximum 
 }
 ```
 ### Without Maximum:
-![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example03.gif)
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example03.gif)
 #### Code:
 ```csharp
 const int max = 500;
@@ -83,7 +83,7 @@ using (var pb = new ProgressBar() { Maximum = null })
 }
 ```
 ### Without Processing text:
-![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example04.gif)
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example04.gif)
 #### Code:
 ```csharp
 const int max = 500;
@@ -101,15 +101,15 @@ using (var pb = new ProgressBar() { Maximum = max })
 ```
 Writing on Console:
 
-![Screencapture ConsoleProgressBar Demo3](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo3.gif)
+![Screencapture ConsoleProgressBar Demo3](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo3.gif)
 
-![Screencapture ConsoleProgressBar Demo4](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo4.gif)
+![Screencapture ConsoleProgressBar Demo4](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo4.gif)
 
 Styling ProgressBar:
 
-![Screencapture ConsoleProgressBar Demo](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo.gif)
+![Screencapture ConsoleProgressBar Demo](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo.gif)
 
-![Screencapture ConsoleProgressBar Demo2](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo2.gif)
+![Screencapture ConsoleProgressBar Demo2](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo2.gif)
 
 
 ## Install
