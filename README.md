@@ -101,15 +101,15 @@ using (var pb = new ProgressBar() { Maximum = max })
 ```
 Writing on Console:
 
-![Screencapture ConsoleProgressBar Demo3](docs/img/ProgressBarConsole-Demo3.gif)
+![Screencapture ConsoleProgressBar Demo3](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo3.gif)
 
-![Screencapture ConsoleProgressBar Demo4](docs/img/ProgressBarConsole-Demo4.gif)
+![Screencapture ConsoleProgressBar Demo4](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo4.gif)
 
 Styling ProgressBar:
 
-![Screencapture ConsoleProgressBar Demo](docs/img/ProgressBarConsole-Demo.gif)
+![Screencapture ConsoleProgressBar Demo](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo.gif)
 
-![Screencapture ConsoleProgressBar Demo2](docs/img/ProgressBarConsole-Demo2.gif)
+![Screencapture ConsoleProgressBar Demo2](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Demo2.gif)
 
 
 ## Install
@@ -118,21 +118,3 @@ Styling ProgressBar:
 Go to [Nuget project page](https://www.nuget.org/packages/iluvadev.ConsoleProgressBar/) to see options
 
 
-## Usage
-You can configure a lot of things, but usage is simple:
-```csharp
-const int max = 500;
-
-//Create the ProgressBar
-using (var pb = new ProgressBar{ Maximum = max })
-{
-    for (int i = 0; i < max; i++)
-    {
-        Task.Delay(50).Wait(); //Do something
-        pb.PerformStep(); //Step in ProgressBar (Default is 1)
-    }
-}
-```
-And produces:
-
-![Output of Ussage](docs/img/ProgressBarConsole-Example_Usage1.gif)
