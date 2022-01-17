@@ -21,20 +21,17 @@ namespace iluvadev.ConsoleProgressBarDemo
         {
             //DefaultProgressBarDemo.RunDemo();
 
+            Console.ReadKey();
+
+            DemoProgressBar.Example04();
+            //CustomProcessingTextDemo.HideAlways();
+
+            //CustomProcessingTextDemo.RunDemo();
+
+            Console.ReadKey();
+            //Console.CursorVisible = false;
+            //Example_Usage1();
             //Console.ReadKey();
-
-            CustomProcessingTextDemo.RunDemo();
-
-            Example1();
-            //Example2();
-            //Example3();
-            //Example4();
-            Example5();
-
-            Console.ReadKey();
-            Console.CursorVisible = false;
-            Example_Usage1();
-            Console.ReadKey();
 
 
             //Console.WriteLine();

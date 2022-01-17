@@ -25,11 +25,80 @@ This time is configurable, modifying the ``Delay`` property (default: 75ms)
 
 
 
-## Examples in images
-Default ProgressBar:
+## Examples with images
+### Default ProgressBar:
 
-![Output of Ussage](docs/img/ProgressBarConsole-Example_Usage1.gif)
+![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example01.gif)
+#### Code:
+```csharp
+const int max = 500;
 
+//Create the ProgressBar
+using (var pb = new ProgressBar { Maximum = max })
+{
+	for (int i = 0; i < max; i++)
+	{
+		Task.Delay(10).Wait(); //Do something
+		pb.PerformStep(); //Step in ProgressBar (Default is 1)
+	}
+}
+```
+### With params:
+
+![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example02.gif)
+#### Code:
+```csharp
+const int max = 1000;
+
+//Create the ProgressBar
+// initialPosition: Console Line to put the ProgressBar (optional, last Console line is assumed)
+// autoStart: Optional, default true
+// Maximum: The Max value in ProgressBar (Default is 100)
+// Step: The increment when performStep (Default is 1)
+using (var pb = new ProgressBar(initialPosition: 3, autoStart: false) { Maximum = max, Step = 2})
+{
+	pb.Start(); // autoStart=false -> we need start manually
+	for (int i = 0; i < max; i+=pb.Step)
+	{
+		Task.Delay(10).Wait(); //Do something
+		pb.PerformStep(); //Step in ProgressBar
+	}
+}
+```
+### Without Maximum:
+![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example03.gif)
+#### Code:
+```csharp
+const int max = 500;
+
+//Create the ProgressBar
+// Maximum: The Max value in ProgressBar (Default is 100)
+using (var pb = new ProgressBar() { Maximum = null })
+{
+	for (int i = 0; i < max; i++)
+	{
+		Task.Delay(10).Wait(); //Do something
+		pb.PerformStep(); //Step in ProgressBar (Default is 1)
+	}
+}
+```
+### Without Processing text:
+![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example04.gif)
+#### Code:
+```csharp
+const int max = 500;
+
+//Create the ProgressBar
+using (var pb = new ProgressBar() { Maximum = max })
+{
+	pb.Text.Body.Processing.SetVisible(false); //Set always Visible = false
+	for (int i = 0; i < max; i++)
+	{
+		Task.Delay(10).Wait(); //Do something
+		pb.PerformStep(); //Step in ProgressBar (Default is 1)
+	}
+}
+```
 Writing on Console:
 
 ![Screencapture ConsoleProgressBar Demo3](docs/img/ProgressBarConsole-Demo3.gif)
@@ -50,7 +119,7 @@ Go to [Nuget project page](https://www.nuget.org/packages/iluvadev.ConsoleProgre
 
 
 ## Usage
-You can configure a lot of things, but usage is very simple:
+You can configure a lot of things, but usage is simple:
 ```csharp
 const int max = 500;
 
