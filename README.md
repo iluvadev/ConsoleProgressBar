@@ -304,7 +304,7 @@ using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
 
   // Setting "Description" when "Processing", with color
   pb.Text.Description.Processing.AddNew().SetValue(pb => $"{pb.ElementName}...")
-                       .SetForegroundColor(ConsoleColor.DarkGray);
+                                         .SetForegroundColor(ConsoleColor.DarkGray);
   
 
   // Hide "Margins"
@@ -337,7 +337,7 @@ using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
   }
 }
 ```
-###Other Style examples:
+### Other Style examples:
 
 ![Screencapture ConsoleProgressBar Demo](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo.gif)
 
