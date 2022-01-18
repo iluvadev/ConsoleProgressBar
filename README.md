@@ -188,6 +188,54 @@ using (var pb = new ProgressBar() { Maximum = max, FixedInBottom = true })
   }
 }
 ```
+### Styling:
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example09.gif)
+#### Code:
+```csharp
+const int max = 500;
+
+//Create the ProgressBar
+using (var pb = new ProgressBar() { Maximum = max })
+{
+  // Hide Text
+  pb.Text.Body.SetVisible(false);
+  
+  // Clear "Description Text"
+  pb.Text.Description.Clear();
+
+  // Setting "Description Indentation", with color
+  pb.Text.Description.Indentation.SetValue("└───> ")
+                                 .SetForegroundColor(ConsoleColor.Cyan);
+
+  // Setting "Description Text" when "Done", with color
+  pb.Text.Description.Done.AddNew().SetValue(pb => $"{pb.Value} elements in {pb.TimeProcessing.TotalSeconds}s.")
+                                   .SetForegroundColor(ConsoleColor.DarkBlue);
+  
+  // Hide "Margins"
+  pb.Layout.Margins.SetVisible(false);
+
+  // Setting "Body" layout
+  pb.Layout.Body.SetValue('─');
+  pb.Layout.Body.Progress.SetForegroundColor(ConsoleColor.DarkGreen);
+  pb.Layout.Body.Pending.SetForegroundColor(ConsoleColor.DarkRed);
+  
+  // Setting "Marquee" layout
+  pb.Layout.Marquee.SetValue('─');
+  pb.Layout.Marquee.OverProgress.SetForegroundColor(ConsoleColor.Yellow);
+  pb.Layout.Marquee.OverPending.SetForegroundColor(ConsoleColor.DarkYellow);
+
+  // Setting ProgressBar width
+  pb.Layout.ProgressBarWidth = Console.BufferWidth;
+
+  for (int i = 0; i < max; i++)
+  {
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(); //Step in ProgressBar (Default is 1)
+  }
+}
+}
+
+```
 
 Styling ProgressBar:
 

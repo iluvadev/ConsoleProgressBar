@@ -19,14 +19,9 @@ namespace iluvadev.ConsoleProgressBarDemo
     {
         static void Main(string[] args)
         {
-            //DefaultProgressBarDemo.RunDemo();
-
             Console.ReadKey();
 
-            DemoProgressBar.Example07();
-            //CustomProcessingTextDemo.FixedText();
-
-            //CustomProcessingTextDemo.RunDemo();
+            DemoProgressBar.Example09();
 
             Console.ReadKey();
             //Console.CursorVisible = false;
@@ -49,24 +44,6 @@ namespace iluvadev.ConsoleProgressBarDemo
             //}
             //Console.ReadKey();
 
-            ////Console.WriteLine("àð═══i─");
-            //Console.WriteLine(" ProgressBar with KeepInLastLine (default) - Writing in Console");
-            //Console.WriteLine();
-            //Console.ReadKey();
-            //using (var pb = new ProgressBar() { Maximum = 500, FixedInBottom = true })
-            //{
-            //    pb.Description.Clear();
-
-            //    for (int i = 0; i < 500; i++)
-            //    {
-            //        string elementName = elementNames[i % elementNames.Count];
-            //        pb.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]: Start processing {i} - {elementName}", false);
-            //        Task.Delay(10).Wait();
-            //        pb.PerformStep(elementName);
-            //        pb.WriteLine($"> [{DateTime.Now.ToString("HH:mm:ss.fff")}]: End processing {i} - {elementName}", false);
-            //    }
-            //}
-            //Console.ReadKey();
 
             //Console.WriteLine();
             //Console.WriteLine();
