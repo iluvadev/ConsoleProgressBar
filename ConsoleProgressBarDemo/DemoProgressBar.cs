@@ -126,6 +126,35 @@ namespace iluvadev.ConsoleProgressBarDemo
         }
         public static void Example07()
         {
+            const int max = 500;
+
+            //Create the ProgressBar
+            using (var pb = new ProgressBar() { Maximum = max })
+            {
+                //Clear "Description Text"
+                pb.Text.Description.Clear();
+
+                //Setting "Description Text" when "Processing"
+                pb.Text.Description.Processing.AddNew().SetValue(pb => $"Element: {pb.ElementName}");
+                pb.Text.Description.Processing.AddNew().SetValue(pb => $"Count: {pb.Value}");
+                pb.Text.Description.Processing.AddNew().SetValue(pb => $"Processing time: {pb.TimeProcessing.TotalSeconds}s.");
+                pb.Text.Description.Processing.AddNew().SetValue(pb => $"Estimated remaining time: {pb.TimeRemaining?.TotalSeconds}s.");
+
+                //Setting "Description Text" when "Done"
+                pb.Text.Description.Done.AddNew().SetValue(pb => $"{pb.Value} elements in {pb.TimeProcessing.TotalSeconds}s.");
+
+                for (int i = 0; i < max; i++)
+                {
+                    string elementName = Guid.NewGuid().ToString();
+
+                    Task.Delay(10).Wait(); //Do something
+                    pb.PerformStep(elementName); //Step in ProgressBar. Setting current ElementName
+                }
+            }
+        }
+
+        public static void Example08()
+        {
             const int max = 150;
 
             //Create the ProgressBar

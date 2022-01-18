@@ -23,7 +23,7 @@ namespace iluvadev.ConsoleProgressBarDemo
 
             Console.ReadKey();
 
-            DemoProgressBar.Example06();
+            DemoProgressBar.Example07();
             //CustomProcessingTextDemo.FixedText();
 
             //CustomProcessingTextDemo.RunDemo();
