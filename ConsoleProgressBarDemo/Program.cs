@@ -21,108 +21,11 @@ namespace iluvadev.ConsoleProgressBarDemo
         {
             Console.ReadKey();
 
-            DemoProgressBar.Example09();
+            DemoProgressBar.Example10();
+            //Example2();
 
             Console.ReadKey();
-            //Console.CursorVisible = false;
-            //Example_Usage1();
-            //Console.ReadKey();
-
-
-            //Console.WriteLine();
-            //Console.WriteLine(" ProgressBar with Progress and Marquee (default config)");
-            //Console.WriteLine();
-            //Console.ReadKey();
-            //using (var pb = new ProgressBar() { Maximum = 1000 })
-            //{
-            //    for (int i = 0; i < 1000; i++)
-            //    {
-            //        string elementName = elementNames[i % elementNames.Count];
-            //        Task.Delay(10).Wait();
-            //        pb.PerformStep(elementName);
-            //    }
-            //}
-            //Console.ReadKey();
-
-
-            //Console.WriteLine();
-            //Console.WriteLine();
-            //Console.WriteLine(" ProgressBar without progress:");
-            //Console.WriteLine();
-            //Console.ReadKey();
-            //using (var pg = new ProgressBar() { ShowProgress = false })
-            //{
-            //    for (int i = 0; i < 500; i++)
-            //    {
-            //        var randomNum = random.Next(100);
-            //        string elementName = "";
-            //        for (int j = 0; j < randomNum; j++)
-            //            elementName += (char)(random.Next(25) + 97);
-
-            //        pg.CurrentElementName = elementName;
-            //        Task.Delay(10).Wait();
-            //        pg.PerformStep();
-            //    }
-            //}
-            //Console.ReadKey();
-
-
-
-            //Console.WriteLine();
-            //Console.WriteLine();
-            //Console.WriteLine(" ProgressBarConsole without progress: ");
-            ////Console.ReadKey();
-            //using (var pg = new ProgressBarConsole { ShowProgress = false })
-            //{
-            //    pg.Text = "Doing something or waiting for a response...";
-            //    Task.Delay(5000).Wait();
-            //    pg.Text = "Ok, done.";
-            //}
-            ////Console.ReadKey();
-
-            //Console.WriteLine();
-            //Console.WriteLine();
-            //Console.WriteLine(" ProgressBarConsole without marquee: ");
-            ////Console.ReadKey();
-            //using (var pg = new ProgressBarConsole { ShowMarquee = false })
-            //{
-            //    for (int i = 0; i < 100; i++)
-            //    {
-            //        Task.Delay(100).Wait();
-            //        pg.PerformStep();
-            //    }
-            //}
-            ////Console.ReadKey();
-
-            //Console.WriteLine();
-            //Console.WriteLine();
-            //Console.WriteLine(" ProgressBarConsole with customization: ");
-            ////Console.ReadKey();
-            //ProgressBarLayout pgLayout1 = new ProgressBarLayout
-            //{
-            //    Start = "",
-            //    End = "",
-            //    Pending = '>',
-            //    Progress = '█',
-            //    MarqueeAlone = '·',
-            //    MarqueeInProgressPending = '·',
-            //    MarqueeInProgress = '▓',
-            //};
-            //using (var pg = new ProgressBarConsole(pgLayout1)
-            //{
-            //    ProgressTextFunc = null,
-            //    InnerLength = Console.BufferWidth - pgLayout1.Start.Length - pgLayout1.End.Length,
-            //    MarqueeDelay = 10,
-            //    Maximum = 1000,
-            //})
-            //{
-            //    for (int i = 0; i < 1000; i++)
-            //    {
-            //        Task.Delay(10).Wait();
-            //        pg.PerformStep();
-            //    }
-            //}
-            ////Console.ReadKey();
+ 
 
             //Console.WriteLine();
             //Console.WriteLine();

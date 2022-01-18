@@ -188,14 +188,14 @@ using (var pb = new ProgressBar() { Maximum = max, FixedInBottom = true })
   }
 }
 ```
-### Styling:
+### Styling (1):
 ![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example09.gif)
 #### Code:
 ```csharp
 const int max = 500;
 
 //Create the ProgressBar
-using (var pb = new ProgressBar() { Maximum = max })
+using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
 {
   // Hide Text
   pb.Text.Body.SetVisible(false);
@@ -227,14 +227,64 @@ using (var pb = new ProgressBar() { Maximum = max })
   // Setting ProgressBar width
   pb.Layout.ProgressBarWidth = Console.BufferWidth;
 
+  pb.Start();
+
   for (int i = 0; i < max; i++)
   {
     Task.Delay(10).Wait(); //Do something
     pb.PerformStep(); //Step in ProgressBar (Default is 1)
   }
 }
-}
+```
+### Styling (2):
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example10.gif)
+#### Code:
+```csharp
+const int max = 500;
 
+//Create the ProgressBar
+using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
+{
+  // Hide Text
+  pb.Text.Body.SetVisible(false);
+
+  // Clear "Description Text"
+  pb.Text.Description.Clear();
+
+  // Hide "Margins"
+  pb.Layout.Margins.SetVisible(false);
+
+  // Hide "Marquee"
+  pb.Layout.Marquee.SetVisible(false);
+
+  // Setting Body Colors
+  pb.Layout.Body.Pending.SetForegroundColor(ConsoleColor.White)
+                        .SetBackgroundColor(ConsoleColor.DarkRed);
+  pb.Layout.Body.Progress.SetForegroundColor(ConsoleColor.Black)
+                         .SetBackgroundColor(ConsoleColor.DarkGreen);
+
+  // Setting Body Text (internal text), from Layout
+  pb.Layout.Body.Text.SetVisible(true).SetValue(pb =>
+  {
+    if (pb.IsDone)
+      return $"{pb.Value} elements processed in {pb.TimeProcessing.TotalSeconds}s.";
+    else
+      return $"{pb.Percentage}%... Remaining: {pb.TimeRemaining?.TotalSeconds}s. - Current: {pb.ElementName}";
+  });
+
+  // Setting ProgressBar width
+  pb.Layout.ProgressBarWidth = Console.BufferWidth;
+
+  pb.Start();
+
+  for (int i = 0; i < max; i++)
+  {
+    string elementName = Guid.NewGuid().ToString();
+
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(elementName); //Step in ProgressBar. Setting current ElementName
+  }
+}
 ```
 
 Styling ProgressBar:
