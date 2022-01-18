@@ -3,7 +3,7 @@
 # ConsoleProgressBar
 A versatile and easy to use ProgressBar for Console applications, written in C#. 
 
-Is **.Net Standard 2.1** (cross-platform ready), but only tested on Windows.
+Is **.Net Standard 2.1** (cross-platform ready).
 
 ## Features
 * Simple to use with many configuration options
