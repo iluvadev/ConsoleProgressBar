@@ -28,7 +28,7 @@ This time is configurable, modifying the ``Delay`` property (default: 75ms)
 ## Examples with images
 ### Default ProgressBar:
 
-![Output of Ussage](https://github.com/iluvadev/ConsoleProgressBar/blob/main/docs/img/ProgressBarConsole-Example01.gif)
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example01.gif)
 #### Code:
 ```csharp
 const int max = 500;
@@ -36,11 +36,11 @@ const int max = 500;
 //Create the ProgressBar
 using (var pb = new ProgressBar { Maximum = max })
 {
-	for (int i = 0; i < max; i++)
-	{
-		Task.Delay(10).Wait(); //Do something
-		pb.PerformStep(); //Step in ProgressBar (Default is 1)
-	}
+  for (int i = 0; i < max; i++)
+  {
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(); //Step in ProgressBar (Default is 1)
+  }
 }
 ```
 ### With params:
@@ -57,12 +57,12 @@ const int max = 1000;
 // Step: The increment when performStep (Default is 1)
 using (var pb = new ProgressBar(initialPosition: 3, autoStart: false) { Maximum = max, Step = 2})
 {
-	pb.Start(); // autoStart=false -> we need start manually
-	for (int i = 0; i < max; i+=pb.Step)
-	{
-		Task.Delay(10).Wait(); //Do something
-		pb.PerformStep(); //Step in ProgressBar
-	}
+  pb.Start(); // autoStart=false -> we need start manually
+  for (int i = 0; i < max; i+=pb.Step)
+  {
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(); //Step in ProgressBar
+  }
 }
 ```
 ### Without Maximum:
@@ -75,15 +75,15 @@ const int max = 500;
 // Maximum: The Max value in ProgressBar (Default is 100)
 using (var pb = new ProgressBar() { Maximum = null })
 {
-	for (int i = 0; i < max; i++)
-	{
-		Task.Delay(10).Wait(); //Do something
-		pb.PerformStep(); //Step in ProgressBar (Default is 1)
-	}
+  for (int i = 0; i < max; i++)
+  {
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(); //Step in ProgressBar (Default is 1)
+  }
 }
 ```
-### Without Processing text:
-![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example04.gif)
+### Setting text:
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example05.gif)
 #### Code:
 ```csharp
 const int max = 500;
@@ -91,12 +91,72 @@ const int max = 500;
 //Create the ProgressBar
 using (var pb = new ProgressBar() { Maximum = max })
 {
-	pb.Text.Body.Processing.SetVisible(false); //Set always Visible = false
-	for (int i = 0; i < max; i++)
-	{
-		Task.Delay(10).Wait(); //Do something
-		pb.PerformStep(); //Step in ProgressBar (Default is 1)
-	}
+  //Setting fixed "Processing Text" 
+  pb.Text.Body.Processing.SetValue("Processing, please wait...");
+
+  //Setting "Done Text"
+  pb.Text.Body.Done.SetValue("Well done!!");
+
+  //Clear "Description Text"
+  pb.Text.Description.Clear();
+
+  for (int i = 0; i < max; i++)
+  {
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(); //Step in ProgressBar (Default is 1)
+  }
+}
+```
+### Setting contextual text:
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example06.gif)
+#### Code:
+```csharp
+const int max = 500;
+
+//Create the ProgressBar
+using (var pb = new ProgressBar() { Maximum = max })
+{
+  //Setting "Processing Text" with context 
+  pb.Text.Body.Processing.SetValue(pb => ($"Processing {pb.ElementName}, please wait..."));
+
+  //Setting "Done Text" with context
+  pb.Text.Body.Done.SetValue(pb=> $"Processed {pb.Maximum} in {pb.TimeProcessing.TotalSeconds}s.");
+
+  //Clear "Description Text"
+  pb.Text.Description.Clear();
+
+  for (int i = 0; i < max; i++)
+  {
+    string elementName = Guid.NewGuid().ToString();
+
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(elementName); //Step in ProgressBar. Setting current ElementName
+  }
+}
+```
+### Writing on Console:
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example07.gif)
+#### Code:
+```csharp
+  const int max = 150;
+
+  //Create the ProgressBar
+  using (var pb = new ProgressBar() { Maximum = max, FixedInBottom = true })
+  {
+    //Clear "Description Text"
+  pb.Text.Description.Clear();
+  
+  for (int i = 0; i < max; i++)
+  {
+    string elementName = Guid.NewGuid().ToString();
+    
+    Task.Delay(50).Wait(); //Do something
+    pb.PerformStep(); //Step in ProgressBar (Default is 1)
+    
+    //Writing on Console with ProgressBar
+    pb.WriteLine($"> [{DateTime.Now:HH:mm:ss.fff}]: Processed {i}: {elementName}");
+    }
+  }
 }
 ```
 Writing on Console:
