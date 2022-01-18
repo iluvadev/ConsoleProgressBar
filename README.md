@@ -1,3 +1,5 @@
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/iluvadev)
+
 # ConsoleProgressBar
 A versatile and easy to use ProgressBar for Console applications, written in C#. 
 
