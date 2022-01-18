@@ -21,7 +21,7 @@ namespace iluvadev.ConsoleProgressBarDemo
         {
             Console.ReadKey();
 
-            DemoProgressBar.Example10();
+            DemoProgressBar.Example11();
             //Example2();
 
             Console.ReadKey();
@@ -61,124 +61,6 @@ namespace iluvadev.ConsoleProgressBarDemo
         }
 
 
-        private static void Example1()
-        {
-            Random random = new Random(Guid.NewGuid().GetHashCode());
-            //Randomize elementNames
-            var elementNames = new List<string>();
-            for (int i = 0; i < 1000; i++)
-            {
-                var randomNum = random.Next(200) + 20;
-                string elementName = "";
-                for (int j = 0; j < randomNum; j++)
-                    elementName += (char)(random.Next(25) + 65);
-                elementNames.Add(elementName);
-            }
-
-            Console.ReadKey();
-            Console.Clear();
-            Console.SetCursorPosition(0, 0);
-            Console.Write("ProgressBar 1:");
-            Console.CursorVisible = false;
-            Task taskPb1 = new Task(() =>
-            {
-                using (var pb = new ProgressBar(1, false) { Maximum = 500 })
-                {
-                    pb.Text.Description.Clear();
-                    pb.Text.Description.Done
-                        .AddNew()
-                        .SetValue(p => $"Progress Bar 1: {p.Value} done in {p.TimeProcessing.ToStringWithAllHours()}")
-                        .SetForegroundColor(ConsoleColor.DarkBlue);
-                    pb.Text.Description.Indentation.SetValue("  └───> ");
-
-                    pb.Layout.Marquee.SetVisible(false);
-                    pb.Layout.Margins.SetVisible(false);
-                    pb.Layout.Body.SetValue('─').Pending.SetForegroundColor(ConsoleColor.DarkRed);
-                    pb.Layout.Marquee.SetValue('─');
-                    pb.Layout.ProgressBarWidth = Console.BufferWidth;
-
-                    pb.Start();
-                    for (int i = 0; i < 500; i++)
-                    {
-                        Task.Delay(10).Wait();
-                        pb.PerformStep(elementNames[i % elementNames.Count]);
-                    }
-                }
-            });
-            taskPb1.Start();
-
-            Console.SetCursorPosition(0, 4);
-            Console.Write("ProgressBar 2:");
-            Console.CursorVisible = false;
-            Task taskPb2 = new Task(() =>
-            {
-                using (var pb = new ProgressBar(5, false) { Maximum = 500 })
-                {
-                    pb.Text.Body.Done
-                        .SetValue(p => $"Progress Bar 2: {p.Value} elements processed in {p.TimeProcessing.ToStringWithAllHours()}")
-                        .SetForegroundColor(p => ConsoleColor.Green);
-
-                    pb.Text.Description.Clear();
-
-                    pb.Start();
-                    for (int i = 0; i < 500; i++)
-                    {
-                        Task.Delay(15).Wait();
-                        pb.PerformStep(elementNames[i % elementNames.Count]);
-                    }
-                }
-            });
-            taskPb2.Start();
-
-            Console.SetCursorPosition(0, 8);
-            Console.Write("ProgressBar 3:");
-            Console.CursorVisible = false;
-            Task taskPb3 = new Task(() =>
-            {
-                using (var pb = new ProgressBar(9, false) { Maximum = 500 })
-                {
-                    pb.Layout.ProgressBarWidth = Console.BufferWidth;
-                    pb.Layout.Body.Pending.SetValue('─');
-                    pb.Layout.Marquee.OverPending.SetValue('─');
-
-                    pb.Start();
-                    for (int i = 0; i < 500; i++)
-                    {
-                        Task.Delay(20).Wait();
-                        pb.PerformStep(elementNames[i % elementNames.Count]);
-                    }
-                }
-            });
-            taskPb3.Start();
-
-            Console.SetCursorPosition(0, 13);
-            Console.Write("ProgressBar 4:");
-            Console.CursorVisible = false;
-            Task taskPb4 = new Task(() =>
-            {
-                using (var pb = new ProgressBar(14, false) { Maximum = null })
-                {
-                    pb.Layout.ProgressBarWidth = 15;
-                    pb.Layout.Margins.SetVisible(false);
-                    pb.Layout.Body.Pending.SetValue('■').SetForegroundColor(ConsoleColor.Magenta);
-                    pb.Layout.Marquee.OverPending.SetValue('■');
-
-                    pb.Text.Description.Clear();
-                    pb.Text.Description.Processing.AddNew().SetValue(p => p.Value.ToString()).SetForegroundColor(ConsoleColor.Yellow);
-                    pb.Text.Description.Processing.AddNew().SetValue(p => p.TimeProcessing.ToStringWithAllHours()).SetForegroundColor(ConsoleColor.Cyan);
-
-                    pb.Start();
-                    for (int i = 0; i < 500; i++)
-                    {
-                        Task.Delay(25).Wait();
-                        pb.PerformStep(elementNames[i % elementNames.Count]);
-                    }
-                }
-            });
-            taskPb4.Start();
-
-            Task.WaitAll(taskPb1, taskPb2, taskPb3, taskPb4);
-        }
         private static void Example2()
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());

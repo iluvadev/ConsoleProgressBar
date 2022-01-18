@@ -270,5 +270,56 @@ namespace iluvadev.ConsoleProgressBarDemo
             }
         }
 
+        public static void Example11()
+        {
+            const int max = 500;
+
+            //Create the ProgressBar
+            using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
+            {
+                // Hide Text
+                pb.Text.Body.SetVisible(false);
+
+                // Clear "Description Text"
+                pb.Text.Description.Clear();
+
+                // Hide "Description Indentation"
+                pb.Text.Description.Indentation.SetVisible(false);
+
+                // Setting "Description" when "Processing", with color
+                pb.Text.Description.Processing.AddNew().SetValue(pb => $"{pb.ElementName}...")
+                                                       .SetForegroundColor(ConsoleColor.DarkGray);
+                
+
+                // Hide "Margins"
+                pb.Layout.Margins.SetVisible(false);
+
+                // Set "Marquee" Color
+                pb.Layout.Marquee.SetBackgroundColor(ConsoleColor.Black);
+
+                // Setting Body Colors
+                pb.Layout.Body.SetBackgroundColor(ConsoleColor.Black);
+                pb.Layout.Body.Pending.SetForegroundColor(ConsoleColor.Red);
+                pb.Layout.Body.Progress.SetForegroundColor(pb => pb.IsDone ? ConsoleColor.Cyan : ConsoleColor.Green);
+
+                // Setting Body Text (internal text), from Layout
+                string textDone = "----------------Done----------------";
+                string text =     "-------------Processing-------------";
+                pb.Layout.Body.Text.SetVisible(true).SetValue(pb => pb.IsDone ? textDone : text);
+
+                // Setting ProgressBar width
+                pb.Layout.ProgressBarWidth = text.Length;
+
+                pb.Start();
+
+                for (int i = 0; i < max; i++)
+                {
+                    string elementName = Guid.NewGuid().ToString();
+
+                    Task.Delay(10).Wait(); //Do something
+                    pb.PerformStep(elementName); //Step in ProgressBar. Setting current ElementName
+                }
+            }
+        }
     }
 }

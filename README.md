@@ -1,5 +1,3 @@
-[***Readme under construction***]
-
 # ConsoleProgressBar
 A versatile and easy to use ProgressBar for Console applications, written in C#. 
 
@@ -286,8 +284,60 @@ using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
   }
 }
 ```
+### Styling (3):
+![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example11.gif)
+#### Code:
+```csharp
+const int max = 500;
 
-Styling ProgressBar:
+//Create the ProgressBar
+using (var pb = new ProgressBar(autoStart: false) { Maximum = max })
+{
+  // Hide Text
+  pb.Text.Body.SetVisible(false);
+
+  // Clear "Description Text"
+  pb.Text.Description.Clear();
+
+  // Hide "Description Indentation"
+  pb.Text.Description.Indentation.SetVisible(false);
+
+  // Setting "Description" when "Processing", with color
+  pb.Text.Description.Processing.AddNew().SetValue(pb => $"{pb.ElementName}...")
+                       .SetForegroundColor(ConsoleColor.DarkGray);
+  
+
+  // Hide "Margins"
+  pb.Layout.Margins.SetVisible(false);
+
+  // Set "Marquee" Color
+  pb.Layout.Marquee.SetBackgroundColor(ConsoleColor.Black);
+
+  // Setting Body Colors
+  pb.Layout.Body.SetBackgroundColor(ConsoleColor.Black);
+  pb.Layout.Body.Pending.SetForegroundColor(ConsoleColor.Red);
+  pb.Layout.Body.Progress.SetForegroundColor(pb => pb.IsDone ? ConsoleColor.Cyan : ConsoleColor.Green);
+
+  // Setting Body Text (internal text), from Layout
+  string textDone = "----------------Done----------------";
+  string text =     "-------------Processing-------------";
+  pb.Layout.Body.Text.SetVisible(true).SetValue(pb => pb.IsDone ? textDone : text);
+
+  // Setting ProgressBar width
+  pb.Layout.ProgressBarWidth = text.Length;
+
+  pb.Start();
+
+  for (int i = 0; i < max; i++)
+  {
+    string elementName = Guid.NewGuid().ToString();
+
+    Task.Delay(10).Wait(); //Do something
+    pb.PerformStep(elementName); //Step in ProgressBar. Setting current ElementName
+  }
+}
+```
+###Other Style examples:
 
 ![Screencapture ConsoleProgressBar Demo](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo.gif)
 
