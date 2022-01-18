@@ -110,7 +110,7 @@ namespace iluvadev.ConsoleProgressBarDemo
                 pb.Text.Body.Processing.SetValue(pb => ($"Processing {pb.ElementName}, please wait..."));
 
                 //Setting "Done Text" with context
-                pb.Text.Body.Done.SetValue(pb=> $"Processed {pb.Maximum} in {pb.TimeProcessing.TotalSeconds}s.");
+                pb.Text.Body.Done.SetValue(pb => $"Processed {pb.Maximum} in {pb.TimeProcessing.TotalSeconds}s.");
 
                 //Clear "Description Text"
                 pb.Text.Description.Clear();

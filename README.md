@@ -120,7 +120,7 @@ using (var pb = new ProgressBar() { Maximum = max })
   pb.Text.Body.Processing.SetValue(pb => ($"Processing {pb.ElementName}, please wait..."));
 
   //Setting "Done Text" with context
-  pb.Text.Body.Done.SetValue(pb=> $"Processed {pb.Maximum} in {pb.TimeProcessing.TotalSeconds}s.");
+  pb.Text.Body.Done.SetValue(pb => $"Processed {pb.Maximum} in {pb.TimeProcessing.TotalSeconds}s.");
 
   //Clear "Description Text"
   pb.Text.Description.Clear();
@@ -138,12 +138,12 @@ using (var pb = new ProgressBar() { Maximum = max })
 ![Output of Ussage](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Example07.gif)
 #### Code:
 ```csharp
-  const int max = 150;
+const int max = 150;
 
-  //Create the ProgressBar
-  using (var pb = new ProgressBar() { Maximum = max, FixedInBottom = true })
-  {
-    //Clear "Description Text"
+//Create the ProgressBar
+using (var pb = new ProgressBar() { Maximum = max, FixedInBottom = true })
+{
+  //Clear "Description Text"
   pb.Text.Description.Clear();
   
   for (int i = 0; i < max; i++)
@@ -155,15 +155,9 @@ using (var pb = new ProgressBar() { Maximum = max })
     
     //Writing on Console with ProgressBar
     pb.WriteLine($"> [{DateTime.Now:HH:mm:ss.fff}]: Processed {i}: {elementName}");
-    }
   }
 }
 ```
-Writing on Console:
-
-![Screencapture ConsoleProgressBar Demo3](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo3.gif)
-
-![Screencapture ConsoleProgressBar Demo4](https://raw.githubusercontent.com/iluvadev/ConsoleProgressBar/main/docs/img/ProgressBarConsole-Demo4.gif)
 
 Styling ProgressBar:
 
